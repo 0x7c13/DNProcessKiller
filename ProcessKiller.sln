@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessKiller", "ProcessKiller\ProcessKiller.csproj", "{430A44FB-0B2C-48B9-B8D3-79AA7F72D1BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{430A44FB-0B2C-48B9-B8D3-79AA7F72D1BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430A44FB-0B2C-48B9-B8D3-79AA7F72D1BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430A44FB-0B2C-48B9-B8D3-79AA7F72D1BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430A44FB-0B2C-48B9-B8D3-79AA7F72D1BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
