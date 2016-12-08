@@ -27,6 +27,8 @@ namespace ProcessKiller
         private ManagementEventWatcher _processStopWatcher;
         private bool _disposed;
 
+        private static readonly object _locker = new object();
+
         public ProcessMonitor(string processName)
         {
             _processName = processName;
@@ -41,7 +43,11 @@ namespace ProcessKiller
 
         public void StopMonitoring()
         {
-            _runningProcesses.Clear();
+            lock (_locker)
+            {
+                _runningProcesses.Clear();
+            }
+
             StopWatcher();
         }
 
@@ -83,7 +89,10 @@ namespace ProcessKiller
             {
                 Console.WriteLine($"Process started: {pName} [{pId}]", pName);
                 var process = Process.GetProcessById(pId);
-                _runningProcesses.Add(process);
+                lock (_locker)
+                {
+                    _runningProcesses.Add(process);
+                }
                 OnEventArrived?.Invoke(ProcessEventType.Start, process);
             }
         }
@@ -96,12 +105,16 @@ namespace ProcessKiller
             if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
             {
                 Console.WriteLine($"Process stopped: {pName} [{pId}]", pName);
-                var processToRemove = _runningProcesses.FirstOrDefault(process => process.Id == pId);
-                OnEventArrived?.Invoke(ProcessEventType.Stop, null);
 
-                if (processToRemove != null)
+                lock (_locker)
                 {
-                    _runningProcesses.Remove(processToRemove);
+                    var processToRemove = _runningProcesses.FirstOrDefault(process => process.Id == pId);
+                    OnEventArrived?.Invoke(ProcessEventType.Stop, null);
+
+                    if (processToRemove != null)
+                    {
+                        _runningProcesses.Remove(processToRemove);
+                    }
                 }
             }
         }

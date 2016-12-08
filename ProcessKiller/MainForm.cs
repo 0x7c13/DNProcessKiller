@@ -72,11 +72,13 @@ namespace ProcessKiller
             this.Controls.Add(_defaultCopyrightLabel);
         }
 
-
         private void InitializeControls()
         {
             this.Controls.Clear();
+            
             this.ClientSize = new Size(_defaultClientRectangleWidth, Math.Max(_defaultClientRectangleHeight, _defaultClientRectangleHeight * _processMonitor.GetRunningProcesses().Count) + _defaultCopyrightLabelHeight);
+
+            _killerButtons = new ConcurrentBag<ProcessButton>();
 
             if (_processMonitor.GetRunningProcesses().Count == 0)
             {
@@ -84,8 +86,6 @@ namespace ProcessKiller
                 InitializeCopyRightLabel(_defaultClientRectangleHeight);
                 return;
             }
-
-            _killerButtons = new ConcurrentBag<ProcessButton>();
 
             var top = _buttonBorder;
             var left = _buttonBorder;
@@ -116,13 +116,10 @@ namespace ProcessKiller
         // Why am I so damn lazy?...
         private void event_arrived(ProcessEventType type, Process process)
         {
+            if (IsDisposed) return;
+
             this.BeginInvoke(new MethodInvoker(() =>
             {
-                foreach (var button in _killerButtons)
-                {
-                    this.Controls.Remove(button);
-                }
-
                 InitializeControls();
 
                 if (type == ProcessEventType.Start)
@@ -152,6 +149,8 @@ namespace ProcessKiller
 
         private void process_enter_foreground(uint pid)
         {
+            if (IsDisposed) return;
+
             this.BeginInvoke(new MethodInvoker(() =>
             {
                 SetProcessButtonActiveByProcessId(pid);
@@ -160,6 +159,8 @@ namespace ProcessKiller
 
         void keyboard_key_down(object sender, KeyEventArgs e)
         {
+            if (IsDisposed) return;
+
             if (e.KeyCode == Keys.F4)
             {
                 this.BeginInvoke(new MethodInvoker(() =>
