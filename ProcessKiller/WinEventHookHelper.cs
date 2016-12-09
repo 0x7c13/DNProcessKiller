@@ -29,14 +29,18 @@ namespace ProcessKiller
 
         private readonly IntPtr _hook;
         private bool _disposed;
+        private readonly WinEventDelegate _winEventDelegate;
 
         public WinEventHookHelper()
         {
-            _hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, new WinEventDelegate(WinEventProc), 0, 0, WINEVENT_OUTOFCONTEXT);
+            _winEventDelegate = new WinEventDelegate(WinEventProc);;
+            _hook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _winEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
+            if (_disposed) return;
+
             uint pid;
             GetWindowThreadProcessId(hwnd, out pid);
 

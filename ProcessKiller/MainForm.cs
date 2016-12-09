@@ -15,11 +15,12 @@ namespace ProcessKiller
     {
         private readonly ProcessMonitor _processMonitor;
         private ConcurrentBag<ProcessButton> _killerButtons;
-        private Label _defaultTextLabel, _defaultCopyrightLabel;
+        private Label _defaultTextLabel, _defaultCopyrightLabel, _defaultVersionLabel;
         private readonly WinEventHookHelper _winEventHook;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
-        private static int _defaultCopyrightLabelHeight = 40;
+        private static int _defaultCopyrightLabelHeight = 20;
+        private static int _defaultVersionLabelHeight = 20;
         private static int _buttonBorder = 5;
         private static int _defaultClientRectangleWidth = 250;
         private static int _defaultClientRectangleHeight = 180;
@@ -31,6 +32,7 @@ namespace ProcessKiller
             InitializeComponent();
 
             _processMonitor = new ProcessMonitor("dragonnest");
+            //_processMonitor = new ProcessMonitor("notepad");
 
             _processMonitor.OnEventArrived += event_arrived;
             InitializeControls();
@@ -41,6 +43,10 @@ namespace ProcessKiller
 
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
+
+            // hacky way to keep delegates alive
+            GC.KeepAlive(_winEventHook);
+            GC.KeepAlive(_keyboardEventHook);
         }
 
         private void InitializeDefaultTextLabel()
@@ -72,11 +78,26 @@ namespace ProcessKiller
             this.Controls.Add(_defaultCopyrightLabel);
         }
 
+        private void InitializeVersionLabel(int top)
+        {
+            _defaultVersionLabel = new Label
+            {
+                Left = _buttonBorder,
+                Top = top,
+                Width = _defaultClientRectangleWidth - _buttonBorder * 2,
+                Height = _defaultVersionLabelHeight,
+                Text = Resources.MainForm_InitializeVersionLabel_Version,
+                Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleCenter,
+            };
+            this.Controls.Add(_defaultVersionLabel);
+        }
+
         private void InitializeControls()
         {
             this.Controls.Clear();
             
-            this.ClientSize = new Size(_defaultClientRectangleWidth, Math.Max(_defaultClientRectangleHeight, _defaultClientRectangleHeight * _processMonitor.GetRunningProcesses().Count) + _defaultCopyrightLabelHeight);
+            this.ClientSize = new Size(_defaultClientRectangleWidth, Math.Max(_defaultClientRectangleHeight, _defaultClientRectangleHeight * _processMonitor.GetRunningProcesses().Count) + _defaultCopyrightLabelHeight + _defaultVersionLabelHeight + _buttonBorder);
 
             _killerButtons = new ConcurrentBag<ProcessButton>();
 
@@ -84,6 +105,7 @@ namespace ProcessKiller
             {
                 InitializeDefaultTextLabel();
                 InitializeCopyRightLabel(_defaultClientRectangleHeight);
+                InitializeVersionLabel(_defaultClientRectangleHeight + _defaultCopyrightLabelHeight);
                 return;
             }
 
@@ -111,6 +133,7 @@ namespace ProcessKiller
             }
 
             InitializeCopyRightLabel(top);
+            InitializeVersionLabel(top + _defaultCopyrightLabelHeight);
         }
 
         // Why am I so damn lazy?...
@@ -128,7 +151,6 @@ namespace ProcessKiller
                 }
             }));
         }
-
 
         private void button_click(object sender, EventArgs e)
         {

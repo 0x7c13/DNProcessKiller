@@ -82,40 +82,54 @@ namespace ProcessKiller
 
         private void startWatch_EventArrived(object sender, EventArrivedEventArgs e)
         {
-            var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
-            var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
-
-            if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-                Console.WriteLine($"Process started: {pName} [{pId}]", pName);
-                var process = Process.GetProcessById(pId);
-                lock (_locker)
+                var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
+                var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
+
+                if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    _runningProcesses.Add(process);
+                    Console.WriteLine($"Process started: {pName} [{pId}]", pName);
+                    var process = Process.GetProcessById(pId);
+                    lock (_locker)
+                    {
+                        _runningProcesses.Add(process);
+                    }
+                    OnEventArrived?.Invoke(ProcessEventType.Start, process);
                 }
-                OnEventArrived?.Invoke(ProcessEventType.Start, process);
+            }
+            catch (Exception ex)
+            {
+                 Console.WriteLine(ex);
             }
         }
 
         private void stopWatch_EventArrived(object sender, EventArrivedEventArgs e)
         {
-            var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
-            var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
-
-            if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-                Console.WriteLine($"Process stopped: {pName} [{pId}]", pName);
+                var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
+                var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
 
-                lock (_locker)
+                if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    var processToRemove = _runningProcesses.FirstOrDefault(process => process.Id == pId);
-                    OnEventArrived?.Invoke(ProcessEventType.Stop, null);
+                    Console.WriteLine($"Process stopped: {pName} [{pId}]", pName);
 
-                    if (processToRemove != null)
+                    lock (_locker)
                     {
-                        _runningProcesses.Remove(processToRemove);
+                        var processToRemove = _runningProcesses.FirstOrDefault(process => process.Id == pId);
+                        OnEventArrived?.Invoke(ProcessEventType.Stop, null);
+
+                        if (processToRemove != null)
+                        {
+                            _runningProcesses.Remove(processToRemove);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                 Console.WriteLine(ex);
             }
         }
 

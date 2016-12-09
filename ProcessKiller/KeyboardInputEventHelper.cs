@@ -26,16 +26,16 @@ namespace ProcessKiller
         [DllImport("User32.dll")]
         public static extern IntPtr UnhookWindowsHookEx(IntPtr hHook);
 
-        private HookDelegate keyBoardDelegate;
-        private readonly IntPtr keyBoardHandle;
+        private HookDelegate _keyBoardDelegate;
+        private readonly IntPtr _keyBoardHandle;
         private const Int32 WH_KEYBOARD_LL = 13;
         private bool _disposed;
 
         public KeyboardInputEventHelper()
         {
-            keyBoardDelegate = KeyboardHookDelegate;
-            keyBoardHandle = SetWindowsHookEx(
-                WH_KEYBOARD_LL, keyBoardDelegate, IntPtr.Zero, 0);
+            _keyBoardDelegate = KeyboardHookDelegate;
+            _keyBoardHandle = SetWindowsHookEx(
+                WH_KEYBOARD_LL, _keyBoardDelegate, IntPtr.Zero, 0);
         }
 
         public struct KeyPressInfo
@@ -52,12 +52,12 @@ namespace ProcessKiller
         {
             var kpi = (KeyPressInfo)Marshal.PtrToStructure(lParam, typeof(KeyPressInfo));
             var key = (Keys)kpi.vkCode;
-            var keyArgs = new KeyEventArgs(key);
+            //var keyArgs = new KeyEventArgs(key);
 
             if (Code < 0)
             {
                 return CallNextHookEx(
-                    keyBoardHandle, Code, wParam, lParam);
+                    _keyBoardHandle, Code, wParam, lParam);
             }
 
             if (Code >= 0 && wParam == (IntPtr)WM_KEYDOWN)
@@ -66,15 +66,15 @@ namespace ProcessKiller
             }
 
             return CallNextHookEx(
-                keyBoardHandle, Code, wParam, lParam);
+                _keyBoardHandle, Code, wParam, lParam);
         }
 
         public void Dispose()
         {
             if (_disposed) return;
-            if (keyBoardHandle != IntPtr.Zero)
+            if (_keyBoardHandle != IntPtr.Zero)
             {
-                UnhookWindowsHookEx(keyBoardHandle);
+                UnhookWindowsHookEx(_keyBoardHandle);
             }
 
             _disposed = true;

@@ -135,4 +135,7 @@
   <data name="MainForm_InitializeCopyRightLabel_CopyrightMessage" xml:space="preserve">
     <value>南方电信一区 柒才 flyingeek@live.com</value>
   </data>
+  <data name="MainForm_InitializeVersionLabel_Version" xml:space="preserve">
+    <value>当前版本: 1.0.0</value>
+  </data>
 </root>

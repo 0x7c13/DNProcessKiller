@@ -97,6 +97,15 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 当前版本: 1.0.0.
+        /// </summary>
+        internal static string MainForm_InitializeVersionLabel_Version {
+            get {
+                return ResourceManager.GetString("MainForm_InitializeVersionLabel_Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 请右键以管理员身份打开此程序.
         /// </summary>
         internal static string Program_ShowAdminErrorDialogBox_AdminPrivilegeMessage {
