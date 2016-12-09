@@ -49,7 +49,6 @@ namespace ProcessKiller
                 return;
             }
 
-            Console.WriteLine($"Process [{pid}] becomes active");
             ProcessEnterForeground?.Invoke(pid);
         }
 

@@ -85,17 +85,17 @@ namespace ProcessKiller
             try
             {
                 var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
-                var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
+                var pId = uint.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
 
                 if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     Console.WriteLine($"Process started: {pName} [{pId}]", pName);
-                    var process = Process.GetProcessById(pId);
+                    var process = Process.GetProcessById((int)pId);
                     lock (_locker)
                     {
                         _runningProcesses.Add(process);
+                        OnEventArrived?.Invoke(ProcessEventType.Start, process);
                     }
-                    OnEventArrived?.Invoke(ProcessEventType.Start, process);
                 }
             }
             catch (Exception ex)
@@ -109,7 +109,7 @@ namespace ProcessKiller
             try
             {
                 var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
-                var pId = int.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
+                var pId = uint.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
 
                 if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -118,11 +118,11 @@ namespace ProcessKiller
                     lock (_locker)
                     {
                         var processToRemove = _runningProcesses.FirstOrDefault(process => process.Id == pId);
-                        OnEventArrived?.Invoke(ProcessEventType.Stop, null);
 
                         if (processToRemove != null)
                         {
                             _runningProcesses.Remove(processToRemove);
+                            OnEventArrived?.Invoke(ProcessEventType.Stop, null);
                         }
                     }
                 }
