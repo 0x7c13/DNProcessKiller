@@ -18,7 +18,7 @@ namespace ProcessKiller
 
     public class ProcessMonitor : IDisposable
     {
-        public delegate void EventArrivedEventHandler(ProcessEventType type, Process process);
+        public delegate void EventArrivedEventHandler(ProcessEventType type, uint pid);
         public event EventArrivedEventHandler OnEventArrived;
 
         private readonly string _processName;
@@ -94,7 +94,7 @@ namespace ProcessKiller
                     lock (_locker)
                     {
                         _runningProcesses.Add(process);
-                        OnEventArrived?.Invoke(ProcessEventType.Start, process);
+                        OnEventArrived?.Invoke(ProcessEventType.Start, pId);
                     }
                 }
             }
@@ -122,7 +122,7 @@ namespace ProcessKiller
                         if (processToRemove != null)
                         {
                             _runningProcesses.Remove(processToRemove);
-                            OnEventArrived?.Invoke(ProcessEventType.Stop, null);
+                            OnEventArrived?.Invoke(ProcessEventType.Stop, pId);
                         }
                     }
                 }

@@ -48,7 +48,7 @@ namespace ProcessKiller
                             this.Text = _defaultText + " " + displayText;
                         }));
                     }
-                    catch (InvalidOperationException ex)
+                    catch (InvalidOperationException)
                     {
                         // ignore
                     }
