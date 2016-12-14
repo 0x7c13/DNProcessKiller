@@ -25,13 +25,26 @@ namespace ProcessKiller
         private const int DefaultCopyrightLabelHeight = 20;
         private const int DefaultVersionInfoLabelHeight = 20;
         private const int DefaultClientRectangleWidth = 250;
+
         private readonly Color _buttonDefaultBackColor = ColorTranslator.FromHtml("#ecf0f1");
+        private readonly FontFamily _defaultFontFamily;
 
         private static readonly object _locker = new object();
 
         public MainForm()
         {
             InitializeComponent();
+
+            _defaultFontFamily = FontFamily.GenericSansSerif;
+
+            try
+            {
+                _defaultFontFamily = new FontFamily("Microsoft YaHei"); // use Microsoft YaHei if it is available
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
 
             _processMonitor = new ProcessMonitor("dragonnest");
             //_processMonitor = new ProcessMonitor("notepad");
@@ -77,7 +90,7 @@ namespace ProcessKiller
                 Width = width,
                 Height = DefaultProcessNotFoundLabelHeight,
                 Text = Resources.MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage,
-                Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular),
+                Font = new Font(_defaultFontFamily, 10, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
             };
         }
@@ -89,7 +102,7 @@ namespace ProcessKiller
                 Width = width,
                 Height = DefaultCopyrightLabelHeight,
                 Text = Resources.MainForm_InitializeCopyRightLabel_CopyrightMessage,
-                Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular),
+                Font = new Font(_defaultFontFamily, 9, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
             };
         }
@@ -101,7 +114,7 @@ namespace ProcessKiller
                 Width = width,
                 Height = DefaultVersionInfoLabelHeight,
                 Text = Resources.MainForm_InitializeVersionLabel_Version,
-                Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular),
+                Font = new Font(_defaultFontFamily, 8, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
             };
         }
@@ -113,7 +126,7 @@ namespace ProcessKiller
                 Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
                 Height = DefaultProcessButtonHeight,
                 Text = Resources.MainForm_InitializeButtons_ClickToKillProcessMessage + " (PID:" + process.Id + ")",
-                Font = new Font(FontFamily.GenericSansSerif, 12, FontStyle.Regular),
+                Font = new Font(_defaultFontFamily, 12, FontStyle.Regular),
                 BackColor = _buttonDefaultBackColor,
                 Process = process,
             };
