@@ -14,26 +14,23 @@ namespace ProcessKiller
     public partial class MainForm : Form
     {
         private readonly ProcessMonitor _processMonitor;
-        private ConcurrentBag<ProcessButton> _killerButtons;
         private Label _processNotFoundLabel, _copyrightLabel, _versionInfoLabel;
-        private FlowLayoutPanel _container;
+        private readonly FlowLayoutPanel _container;
         private FlowLayoutPanel _buttonsContainer;
         private readonly WinEventHookHelper _winEventHook;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
-        private static int _defaultProcessButtonHeight = 150;
-        private static int _defaultProcessNotFoundLabelHeight = 90;
-        private static int _defaultCopyrightLabelHeight = 20;
-        private static int _defaultVersionInfoLabelHeight = 20;
-        private static int _border = 5;
-        private static int _defaultClientRectangleWidth = 250;
+        private const int DefaultProcessButtonHeight = 150;
+        private const int DefaultProcessNotFoundLabelHeight = 90;
+        private const int DefaultCopyrightLabelHeight = 20;
+        private const int DefaultVersionInfoLabelHeight = 20;
+        private const int DefaultClientRectangleWidth = 250;
         private readonly Color _buttonDefaultBackColor = ColorTranslator.FromHtml("#ecf0f1");
 
         private static readonly object _locker = new object();
 
         public MainForm()
         {
-            _killerButtons = new ConcurrentBag<ProcessButton>();
             InitializeComponent();
 
             _processMonitor = new ProcessMonitor("dragonnest");
@@ -45,8 +42,8 @@ namespace ProcessKiller
                 AutoSize = true,
                 AutoScroll = false,
                 FlowDirection = FlowDirection.TopDown,
-                WrapContents = false, // Vertical rather than horizontal scrolling
-                Width = _defaultClientRectangleWidth - _border * 2,
+                WrapContents = false,
+                Width = DefaultClientRectangleWidth,
             };
 
             this.Controls.Add(_container);
@@ -61,9 +58,16 @@ namespace ProcessKiller
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
 
+            this.ResizeEnd += resize_end;
+
             // hacky way to keep delegates alive
             GC.KeepAlive(_winEventHook);
             GC.KeepAlive(_keyboardEventHook);
+        }
+
+        private void resize_end(object sender, EventArgs e)
+        {
+            ResizeWindowIfNeeded();
         }
 
         private Label GetProcessNotFoundLabel(int width)
@@ -71,7 +75,7 @@ namespace ProcessKiller
             return new Label
             {
                 Width = width,
-                Height = _defaultProcessNotFoundLabelHeight,
+                Height = DefaultProcessNotFoundLabelHeight,
                 Text = Resources.MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage,
                 Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -83,7 +87,7 @@ namespace ProcessKiller
             return new Label
             {
                 Width = width,
-                Height = _defaultCopyrightLabelHeight,
+                Height = DefaultCopyrightLabelHeight,
                 Text = Resources.MainForm_InitializeCopyRightLabel_CopyrightMessage,
                 Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -95,7 +99,7 @@ namespace ProcessKiller
             return new Label
             {
                 Width = width,
-                Height = _defaultVersionInfoLabelHeight,
+                Height = DefaultVersionInfoLabelHeight,
                 Text = Resources.MainForm_InitializeVersionLabel_Version,
                 Font = new Font(FontFamily.GenericSansSerif, 8, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
@@ -106,30 +110,16 @@ namespace ProcessKiller
         {
             var button = new ProcessButton
             {
-                Width = _defaultClientRectangleWidth - _buttonsContainer.Padding.Left * 2 - _buttonsContainer.Margin.Left * 2 - _container.Padding.Left * 2 - _container.Margin.Left * 2,
-                Height = _defaultProcessButtonHeight,
+                Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
+                Height = DefaultProcessButtonHeight,
                 Text = Resources.MainForm_InitializeButtons_ClickToKillProcessMessage + " (PID:" + process.Id + ")",
                 Font = new Font(FontFamily.GenericSansSerif, 12, FontStyle.Regular),
                 BackColor = _buttonDefaultBackColor,
                 Process = process,
             };
-            button.Click += button_click;
+            button.Click += process_button_click;
             
             return button;
-        }
-
-        private void ClearControls()
-        {
-            this.Controls.Clear();
-            // dispose if any
-            foreach (var processButton in _killerButtons)
-            {
-                processButton.Dispose();
-            }
-            _processNotFoundLabel?.Dispose();
-            _versionInfoLabel?.Dispose();
-            _copyrightLabel?.Dispose();
-            _killerButtons = new ConcurrentBag<ProcessButton>();
         }
 
         private void InitializeControls(FlowLayoutPanel container)
@@ -138,26 +128,28 @@ namespace ProcessKiller
 
             _processNotFoundLabel = GetProcessNotFoundLabel(width);
 
-            if (_processMonitor.GetRunningProcesses().Count > 0)
-            {
-                _processNotFoundLabel.Hide();
-            }
-            container.Controls.Add(_processNotFoundLabel);
-
             _buttonsContainer = new FlowLayoutPanel()
             {
                 AutoSize = true,
                 AutoScroll = false,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
-                Width = width - _border * 2,
             };
+            _buttonsContainer.ControlAdded += process_button_added;
+            _buttonsContainer.ControlRemoved += process_button_removed;
+
+            if (_processMonitor.GetRunningProcesses().Count > 0)
+            {
+                _processNotFoundLabel.Hide();
+            }
+            container.Controls.Add(_processNotFoundLabel);
 
             for (var i = 0; i < _processMonitor.GetRunningProcesses().Count; i++)
             {
                 var process = _processMonitor.GetRunningProcesses()[i];
                 var button = GetProcessButton(process);
                 _buttonsContainer.Controls.Add(button);
+                button.ShowPerformanceCounter();
             }
             _container.Controls.Add(_buttonsContainer);
             
@@ -165,80 +157,60 @@ namespace ProcessKiller
             container.Controls.Add(_copyrightLabel);
             _versionInfoLabel = GetVersionInfoLabel(width);
             container.Controls.Add(_versionInfoLabel);
-            
-            ResizeWindow();
+
+            ResizeWindowIfNeeded();
         }
 
-        private void ResizeWindow()
+        private void process_button_removed(object sender, ControlEventArgs e)
         {
-            var height = (from Control control in _container.Controls select control.Height).Sum();
+            if (IsDisposed || !this.IsHandleCreated) return;
+
+            if (_buttonsContainer.Controls.Count == 0)
+            {
+                this.BeginInvoke(new MethodInvoker(() =>
+                {
+                    _processNotFoundLabel.Show();
+                }));
+            }
+            else
+            {
+                var pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
+                Console.WriteLine(pid);
+                this.BeginInvoke(new MethodInvoker(() =>
+                {
+                    SetProcessButtonActiveByProcessId(pid);
+                }));
+            }
+        }
+
+        private void process_button_added(object sender, ControlEventArgs e)
+        {
+            if (IsDisposed || !this.IsHandleCreated) return;
+
+            this.BeginInvoke(new MethodInvoker(() =>
+            {
+                _processNotFoundLabel.Hide();
+            }));
+        }
+
+        private void ResizeWindowIfNeeded()
+        {
+            var height = (from Control control in _container.Controls select control.Height).Sum() + _container.Margin.All * (_container.Controls.Count + 2);
             if (_buttonsContainer.Controls.Count > 0)
             {
-                height -= _defaultProcessNotFoundLabelHeight;
+                height -= DefaultProcessNotFoundLabelHeight;
+                height -= _container.Margin.All;
             }
-            this.ClientSize = new Size(_defaultClientRectangleWidth, height + _border * _container.Controls.Count);
+
+            if (DefaultClientRectangleWidth != this.ClientSize.Width || height != this.ClientSize.Height)
+            {
+                this.ClientSize = new Size(DefaultClientRectangleWidth, height);
+            }
         }
 
-        /*
-        private void InitializeControls_old()
-        {
-            if (_processMonitor.GetRunningProcesses().Count == 0)
-            {
-                ClearControls();
-                this.ClientSize = new Size(_defaultClientRectangleWidth, Math.Max(_defaultClientRectangleHeight, _defaultClientRectangleHeight * _processMonitor.GetRunningProcesses().Count) + _defaultCopyrightLabelHeight + _defaultVersionLabelHeight + _buttonBorder);
-
-                //InitializeDefaultTextLabel();
-                //InitializeCopyRightLabel(_defaultClientRectangleHeight);
-                InitializeVersionLabel(_defaultClientRectangleHeight + _defaultCopyrightLabelHeight);
-                return;
-            }
-
-            var top = _buttonBorder;
-            var left = _buttonBorder;
-
-            var buttons = new ConcurrentBag<ProcessButton>();
-
-            for (var i = 0; i < _processMonitor.GetRunningProcesses().Count; i++)
-            {
-                var process = _processMonitor.GetRunningProcesses()[i];
-
-                var button = new ProcessButton
-                {
-                    Left = left,
-                    Top = top,
-                    Width = _defaultClientRectangleWidth - _buttonBorder * 2,
-                    Height = _defaultClientRectangleHeight - _buttonBorder * 2,
-                    Text = Resources.MainForm_InitializeButtons_ClickToKillProcessMessage + " (PID:" + process.Id + ")",
-                    Font = new Font(FontFamily.GenericSansSerif, 12, FontStyle.Regular),
-                    BackColor = _buttonDefaultBackColor,
-                    Process = process,
-                };
-                button.Click += button_click;
-
-                buttons.Add(button);
-                top += button.Height + _buttonBorder;
-
-                button.ShowPerformanceCounter();
-            }
-
-            ClearControls();
-            this.ClientSize = new Size(_defaultClientRectangleWidth, Math.Max(_defaultClientRectangleHeight, _defaultClientRectangleHeight * _processMonitor.GetRunningProcesses().Count) + _defaultCopyrightLabelHeight + _defaultVersionLabelHeight + _buttonBorder);
-
-            _killerButtons = buttons;
-            foreach (var processButton in _killerButtons)
-            {
-                this.Controls.Add(processButton);
-            }
-
-            //InitializeCopyRightLabel(top);
-            InitializeVersionLabel(top + _defaultCopyrightLabelHeight);
-        }
-        */
-
-        // Why am I so damn lazy?...
         private void event_arrived(ProcessEventType type, uint pid)
         {
-            if (IsDisposed) return;
+            if (IsDisposed || !this.IsHandleCreated) return;
 
             lock (_locker)
             {
@@ -246,32 +218,26 @@ namespace ProcessKiller
                 {
                     if (type == ProcessEventType.Start)
                     {
-                        if (_buttonsContainer.Controls.Count == 0)
-                        {
-                            _processNotFoundLabel.Hide();
-                        }
-                        _buttonsContainer?.Controls.Add(GetProcessButton(Process.GetProcessById((int)pid)));
-                        ResizeWindow();
+                        var button = GetProcessButton(Process.GetProcessById((int) pid));
+                        _buttonsContainer?.Controls.Add(button);
+                        button.ShowPerformanceCounter();
                         SetProcessButtonActiveByProcessId(pid);
                     }
                     else if (type == ProcessEventType.Stop)
                     {
                         var buttonToRemove = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(button => button.Process.Id == pid);
-                        if (buttonToRemove != null)
-                        {
-                            _buttonsContainer?.Controls.Remove(buttonToRemove);
-                            if (_buttonsContainer.Controls.Count == 0)
-                            {
-                                _processNotFoundLabel.Show();
-                            }
-                            ResizeWindow();
-                        }
+                        if (buttonToRemove == null) return;
+
+                        buttonToRemove.HidePerformanceCounter();
+                        _buttonsContainer?.Controls.Remove(buttonToRemove);
+                        buttonToRemove.Dispose();
                     }
+                    ResizeWindowIfNeeded();
                 }));
             }
         }
 
-        private void button_click(object sender, EventArgs e)
+        private void process_button_click(object sender, EventArgs e)
         {
             try
             {
@@ -279,6 +245,7 @@ namespace ProcessKiller
                 if (processButton == null) return;
 
                 processButton.Enabled = false;
+                processButton.HidePerformanceCounter();
                 processButton.Text = Resources.MainForm_button_click_KillingProcessMessage;
                 processButton.Process.Kill();
             }
@@ -290,7 +257,7 @@ namespace ProcessKiller
 
         private void process_enter_foreground(uint pid)
         {
-            if (IsDisposed) return;
+            if (IsDisposed || !this.IsHandleCreated) return;
 
             this.BeginInvoke(new MethodInvoker(() =>
             {
@@ -300,7 +267,7 @@ namespace ProcessKiller
 
         void keyboard_key_down(object sender, KeyEventArgs e)
         {
-            if (IsDisposed) return;
+            if (IsDisposed || !this.IsHandleCreated) return;
 
             if (e.KeyCode == Keys.F4)
             {
@@ -308,21 +275,15 @@ namespace ProcessKiller
                 {
                     Console.WriteLine("Terminate key pressed");
 
-                    if (_processMonitor.GetRunningProcesses().Count == 0) return;
+                    if (_buttonsContainer.Controls.Count == 0) return;
 
-                    if (_processMonitor.GetRunningProcesses().Count == 1 && _killerButtons.Count == 1)
+                    if (_buttonsContainer.Controls.Count == 1)
                     {
-                        _killerButtons.First().PerformClick();
+                        ((ProcessButton)_buttonsContainer.Controls[0]).PerformClick();
                     }
                     else
                     {
-                        Button buttonToClick = null;
-                        foreach (var processButton in _killerButtons)
-                        {
-                            if (!processButton.Focused) continue;
-                            buttonToClick = processButton;
-                            break;
-                        }
+                        Button buttonToClick = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(processButton => processButton.Focused);
                         buttonToClick?.PerformClick();
                     }
                 }));
@@ -331,9 +292,7 @@ namespace ProcessKiller
 
         private void SetProcessButtonActiveByProcessId(uint pid)
         {
-            if (_processMonitor.GetRunningProcesses().Count < 2) return;
-
-            foreach (var processButton in _killerButtons)
+            foreach (ProcessButton processButton in _buttonsContainer.Controls)
             {
                 if (processButton.Process.Id == pid)
                 {

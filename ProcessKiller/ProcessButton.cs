@@ -11,55 +11,74 @@ namespace ProcessKiller
     {
         public Process Process;
         private string _defaultText;
+        private bool _showPerformanceCounter;
 
         public void ShowPerformanceCounter()
         {
+            _showPerformanceCounter = true;
             _defaultText = this.Text;
-
-            string processName = null;
-            try
-            {
-                processName = GetProcessInstanceName(Process.Id);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return;
-            }
-
-            var ramCounter = new PerformanceCounter("Process", "Working Set", processName);
-            var cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName);
 
             Task.Run(() =>
             {
-                while (true)
+                UpdatePerformanceCounter();
+            });
+        }
+
+        public void UpdatePerformanceCounter()
+        {
+            var processName = GetProcessInstanceName(Process.Id);
+            var ramCounter = new PerformanceCounter("Process", "Working Set", processName);
+            var cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName);
+
+            while (!IsDisposed && _showPerformanceCounter)
+            {
+                try
                 {
-                    if (IsDisposed) return;
+                    var ram = (long)ramCounter.NextValue();
+                    var cpu = (int)cpuCounter.NextValue();
 
-                    try
+                    var displayText = "内存: " + (ram / 1024 / 1024) + " MB - CPU: " + (cpu / Environment.ProcessorCount) + " %";
+                    //Console.WriteLine(displayText);
+
+                    if (this.IsHandleCreated)
                     {
-                        var ram = (int) ramCounter.NextValue();
-                        var cpu = (int) cpuCounter.NextValue();
-                        var displayText = "内存: " + (ram / 1024 / 1024) + " MB - CPU: " + (cpu / Environment.ProcessorCount) + " %";
-                        //Console.WriteLine(displayText);
-
                         this.BeginInvoke(new MethodInvoker(() =>
                         {
-                            this.Text = _defaultText + " " + displayText;
+                            this.Text = _defaultText + Environment.NewLine + displayText;
                         }));
                     }
-                    catch (InvalidOperationException)
+                }
+                catch (InvalidOperationException ex)
+                {
+                    try
+                    {
+                        if (!string.Equals(processName, GetProcessInstanceName(Process.Id)))
+                        {
+                            processName = GetProcessInstanceName(Process.Id);
+                            ramCounter = new PerformanceCounter("Process", "Working Set", processName);
+                            cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName);
+                        }
+                    }
+                    catch (Exception)
                     {
                         // ignore
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
 
-                    Thread.Sleep(1000);
+                    Console.WriteLine(ex);
                 }
-            });
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+                Thread.Sleep(1000);
+            }
+        }
+
+        public void HidePerformanceCounter()
+        {
+            _showPerformanceCounter = false;
+            this.Text = _defaultText;
         }
 
         private static string GetProcessInstanceName(int pid)
@@ -69,7 +88,6 @@ namespace ProcessKiller
             var instances = cat.GetInstanceNames();
             foreach (var instance in instances)
             {
-
                 using (var cnt = new PerformanceCounter("Process",
                      "ID Process", instance, true))
                 {
