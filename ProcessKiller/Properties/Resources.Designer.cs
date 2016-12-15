@@ -97,7 +97,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 当前版本: 1.0.0.
+        ///   Looks up a localized string similar to 当前版本: 1.1.0.
         /// </summary>
         internal static string MainForm_InitializeVersionLabel_Version {
             get {
