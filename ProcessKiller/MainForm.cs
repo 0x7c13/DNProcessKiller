@@ -66,7 +66,9 @@ namespace ProcessKiller
             _processMonitor.StartMonitoring();
 
             _winEventHook = new WinEventHookHelper();
-            _winEventHook.ProcessEnterForeground += process_enter_foreground;
+            _winEventHook.OnWindowForegroundChanged += window_event_triggered;
+            _winEventHook.OnWindowMinimizeStart += window_event_triggered;
+            _winEventHook.OnWindowMinimizeEnd += window_event_triggered;
 
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
@@ -76,11 +78,6 @@ namespace ProcessKiller
             // hacky way to keep delegates alive
             GC.KeepAlive(_winEventHook);
             GC.KeepAlive(_keyboardEventHook);
-        }
-
-        private void resize_end(object sender, EventArgs e)
-        {
-            ResizeWindowIfNeeded();
         }
 
         private Label GetProcessNotFoundLabel(int width)
@@ -174,6 +171,48 @@ namespace ProcessKiller
             ResizeWindowIfNeeded();
         }
 
+        private void SetProcessButtonActiveByProcessId(uint pid)
+        {
+            foreach (ProcessButton processButton in _buttonsContainer.Controls)
+            {
+                if (processButton.Process.Id == pid)
+                {
+                    Console.WriteLine($"Process [{pid}] becomes active");
+                    processButton.Focus();
+                    processButton.BackColor = ColorTranslator.FromHtml("#87D37C");
+                }
+                else
+                {
+                    processButton.BackColor = _buttonDefaultBackColor;
+                }
+            }
+        }
+
+        private void ResizeWindowIfNeeded()
+        {
+            var height = (from Control control in _container.Controls select control.Height).Sum() + _container.Margin.All * (_container.Controls.Count + 2);
+            if (_buttonsContainer.Controls.Count > 0)
+            {
+                height -= DefaultProcessNotFoundLabelHeight;
+                height -= _container.Margin.All;
+            }
+
+            if (DefaultClientRectangleWidth != this.ClientSize.Width || height != this.ClientSize.Height)
+            {
+                this.ClientSize = new Size(DefaultClientRectangleWidth, height);
+            }
+        }
+
+        private void process_button_added(object sender, ControlEventArgs e)
+        {
+            if (IsDisposed || !this.IsHandleCreated) return;
+
+            this.BeginInvoke(new MethodInvoker(() =>
+            {
+                _processNotFoundLabel.Hide();
+            }));
+        }
+
         private void process_button_removed(object sender, ControlEventArgs e)
         {
             if (IsDisposed || !this.IsHandleCreated) return;
@@ -193,31 +232,6 @@ namespace ProcessKiller
                 {
                     SetProcessButtonActiveByProcessId(pid);
                 }));
-            }
-        }
-
-        private void process_button_added(object sender, ControlEventArgs e)
-        {
-            if (IsDisposed || !this.IsHandleCreated) return;
-
-            this.BeginInvoke(new MethodInvoker(() =>
-            {
-                _processNotFoundLabel.Hide();
-            }));
-        }
-
-        private void ResizeWindowIfNeeded()
-        {
-            var height = (from Control control in _container.Controls select control.Height).Sum() + _container.Margin.All * (_container.Controls.Count + 2);
-            if (_buttonsContainer.Controls.Count > 0)
-            {
-                height -= DefaultProcessNotFoundLabelHeight;
-                height -= _container.Margin.All;
-            }
-
-            if (DefaultClientRectangleWidth != this.ClientSize.Width || height != this.ClientSize.Height)
-            {
-                this.ClientSize = new Size(DefaultClientRectangleWidth, height);
             }
         }
 
@@ -268,12 +282,13 @@ namespace ProcessKiller
             }
         }
 
-        private void process_enter_foreground(uint pid)
+        private void window_event_triggered(uint pid)
         {
             if (IsDisposed || !this.IsHandleCreated) return;
 
             this.BeginInvoke(new MethodInvoker(() =>
             {
+                pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
                 SetProcessButtonActiveByProcessId(pid);
             }));
         }
@@ -302,22 +317,10 @@ namespace ProcessKiller
                 }));
             }
         }
-
-        private void SetProcessButtonActiveByProcessId(uint pid)
+        private void resize_end(object sender, EventArgs e)
         {
-            foreach (ProcessButton processButton in _buttonsContainer.Controls)
-            {
-                if (processButton.Process.Id == pid)
-                {
-                    Console.WriteLine($"Process [{pid}] becomes active");
-                    processButton.Focus();
-                    processButton.BackColor = ColorTranslator.FromHtml("#87D37C");
-                }
-                else
-                {
-                    processButton.BackColor = _buttonDefaultBackColor;
-                }
-            }
+            ResizeWindowIfNeeded();
         }
+
     }
 }

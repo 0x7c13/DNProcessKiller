@@ -20,16 +20,35 @@ namespace ProcessKiller
 
             Task.Run(() =>
             {
-                UpdatePerformanceCounter();
+                StartPerformanceCounter();
             });
         }
 
-        public void UpdatePerformanceCounter()
+        public void StartPerformanceCounter()
         {
-            var processName = GetProcessInstanceName(Process.Id);
-            var ramCounter = new PerformanceCounter("Process", "Working Set", processName);
-            var cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName);
+            string processName = null;
+            PerformanceCounter ramCounter = null;
+            PerformanceCounter cpuCounter = null;
 
+            // init performance counters
+            while (!IsDisposed && _showPerformanceCounter)
+            {
+                try
+                {
+                    processName = GetProcessInstanceName(Process.Id);
+                    ramCounter = new PerformanceCounter("Process", "Working Set", processName);
+                    cpuCounter = new PerformanceCounter("Process", "% Processor Time", processName);
+                    break;
+                }
+                catch (Exception)
+                {
+                    // retry
+                }
+
+                Thread.Sleep(1000);
+            }
+
+            // update performance counters
             while (!IsDisposed && _showPerformanceCounter)
             {
                 try
@@ -38,7 +57,6 @@ namespace ProcessKiller
                     var cpu = (int)cpuCounter.NextValue();
 
                     var displayText = "内存: " + (ram / 1024 / 1024) + " MB - CPU: " + (cpu / Environment.ProcessorCount) + " %";
-                    //Console.WriteLine(displayText);
 
                     if (this.IsHandleCreated)
                     {
