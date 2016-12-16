@@ -124,7 +124,7 @@
     <value>龙之谷掉线器</value>
   </data>
   <data name="MainForm_InitializeButtons_ClickToKillProcessMessage" xml:space="preserve">
-    <value>点我或按F4掉线</value>
+    <value>点我切换至该窗口或按F4掉线</value>
   </data>
   <data name="MainForm_button_click_KillingProcessMessage" xml:space="preserve">
     <value>正在关闭此进程...</value>

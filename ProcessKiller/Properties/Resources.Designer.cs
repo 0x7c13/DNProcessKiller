@@ -70,7 +70,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 点我或按F4掉线.
+        ///   Looks up a localized string similar to 点我切换至该窗口或按F4掉线.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessMessage {
             get {

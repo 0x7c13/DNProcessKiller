@@ -6,12 +6,23 @@ namespace ProcessKiller
     using System.Windows.Forms;
     using System.Diagnostics;
     using System.Threading.Tasks;
+    using Properties;
+    using System.Drawing;
 
     class ProcessButton : Button
     {
         public Process Process;
         private string _defaultText;
+        private bool _isHighlighted;
         private bool _showPerformanceCounter;
+        private readonly Color _highlightColor;
+        private readonly Color _unhighlightColor;
+
+        public ProcessButton(Color highlightColor, Color unhighlightColor)
+        {
+            _highlightColor = highlightColor;
+            _unhighlightColor = unhighlightColor;
+        }
 
         public void ShowPerformanceCounter()
         {
@@ -97,6 +108,32 @@ namespace ProcessKiller
         {
             _showPerformanceCounter = false;
             this.Text = _defaultText;
+        }
+
+        public void KillProcess()
+        {
+            this.Enabled = false;
+            this.HidePerformanceCounter();
+            this.Text = Resources.MainForm_button_click_KillingProcessMessage;
+            this.Process.Kill();
+        }
+
+        public void Highlight()
+        {
+            _isHighlighted = true;
+            this.Select();
+            this.BackColor = _highlightColor;
+        }
+
+        public void Unhighlight()
+        {
+            _isHighlighted = false;
+            this.BackColor = _unhighlightColor;
+        }
+
+        public bool IsHighlighted()
+        {
+            return _isHighlighted;
         }
 
         private static string GetProcessInstanceName(int pid)

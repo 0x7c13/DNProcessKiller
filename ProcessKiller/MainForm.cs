@@ -17,7 +17,7 @@ namespace ProcessKiller
         private Label _processNotFoundLabel, _copyrightLabel, _versionInfoLabel;
         private readonly FlowLayoutPanel _container;
         private FlowLayoutPanel _buttonsContainer;
-        private readonly WinEventHookHelper _winEventHook;
+        private readonly WinEventHelper _winEvent;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
         private const int DefaultProcessButtonHeight = 150;
@@ -27,9 +27,12 @@ namespace ProcessKiller
         private const int DefaultClientRectangleWidth = 250;
 
         private readonly Color _buttonDefaultBackColor = ColorTranslator.FromHtml("#ecf0f1");
+        private readonly Color _buttonHighlightBackColor = ColorTranslator.FromHtml("#87D37C");
+
         private readonly FontFamily _defaultFontFamily;
 
         private static readonly object _locker = new object();
+        private bool _clickToKillProcess = false;
 
         public MainForm()
         {
@@ -65,10 +68,10 @@ namespace ProcessKiller
 
             _processMonitor.StartMonitoring();
 
-            _winEventHook = new WinEventHookHelper();
-            _winEventHook.OnWindowForegroundChanged += window_event_triggered;
-            _winEventHook.OnWindowMinimizeStart += window_event_triggered;
-            _winEventHook.OnWindowMinimizeEnd += window_event_triggered;
+            _winEvent = new WinEventHelper();
+            _winEvent.OnWindowForegroundChanged += window_event_triggered;
+            _winEvent.OnWindowMinimizeStart += window_event_triggered;
+            _winEvent.OnWindowMinimizeEnd += window_event_triggered;
 
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
@@ -76,7 +79,7 @@ namespace ProcessKiller
             this.ResizeEnd += resize_end;
 
             // hacky way to keep delegates alive
-            GC.KeepAlive(_winEventHook);
+            GC.KeepAlive(_winEvent);
             GC.KeepAlive(_keyboardEventHook);
         }
 
@@ -118,7 +121,7 @@ namespace ProcessKiller
 
         private ProcessButton GetProcessButton(Process process)
         {
-            var button = new ProcessButton
+            var button = new ProcessButton(_buttonHighlightBackColor, _buttonDefaultBackColor)
             {
                 Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
                 Height = DefaultProcessButtonHeight,
@@ -178,12 +181,11 @@ namespace ProcessKiller
                 if (processButton.Process.Id == pid)
                 {
                     Console.WriteLine($"Process [{pid}] becomes active");
-                    processButton.Focus();
-                    processButton.BackColor = ColorTranslator.FromHtml("#87D37C");
+                    processButton.Highlight();
                 }
                 else
                 {
-                    processButton.BackColor = _buttonDefaultBackColor;
+                    processButton.Unhighlight();
                 }
             }
         }
@@ -226,7 +228,7 @@ namespace ProcessKiller
             }
             else
             {
-                var pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
+                var pid = WinEventHelper.GetForegroundWindowThreadProcessId();
                 Console.WriteLine(pid);
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
@@ -271,10 +273,15 @@ namespace ProcessKiller
                 var processButton = sender as ProcessButton;
                 if (processButton == null) return;
 
-                processButton.Enabled = false;
-                processButton.HidePerformanceCounter();
-                processButton.Text = Resources.MainForm_button_click_KillingProcessMessage;
-                processButton.Process.Kill();
+                if (_clickToKillProcess)
+                {
+                    processButton.KillProcess();
+                }
+                else
+                {
+                    processButton.Highlight();
+                    WinEventHelper.BringProcessToFront(processButton.Process);
+                }
             }
             catch (Exception ex)
             {
@@ -288,12 +295,12 @@ namespace ProcessKiller
 
             this.BeginInvoke(new MethodInvoker(() =>
             {
-                pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
+                pid = WinEventHelper.GetForegroundWindowThreadProcessId();
                 SetProcessButtonActiveByProcessId(pid);
             }));
         }
 
-        void keyboard_key_down(object sender, KeyEventArgs e)
+        private void keyboard_key_down(object sender, KeyEventArgs e)
         {
             if (IsDisposed || !this.IsHandleCreated) return;
 
@@ -307,20 +314,20 @@ namespace ProcessKiller
 
                     if (_buttonsContainer.Controls.Count == 1)
                     {
-                        ((ProcessButton)_buttonsContainer.Controls[0]).PerformClick();
+                        ((ProcessButton)_buttonsContainer.Controls[0]).KillProcess();
                     }
                     else
                     {
-                        Button buttonToClick = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(processButton => processButton.Focused);
-                        buttonToClick?.PerformClick();
+                        var buttonToClick = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(processButton => processButton.IsHighlighted());
+                        buttonToClick?.KillProcess();
                     }
                 }));
             }
         }
+
         private void resize_end(object sender, EventArgs e)
         {
             ResizeWindowIfNeeded();
         }
-
     }
 }
