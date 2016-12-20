@@ -116,6 +116,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KeyboardInputEventHelper.cs" />
+    <Compile Include="TimerButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ProcessKillerButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ProcessButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -161,6 +167,7 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="pkicon.ico" />
+    <None Include="Resources\alert.wav" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

@@ -123,8 +123,11 @@
   <data name="Program_ShowAdminErrorDialogBox_ApplicationName" xml:space="preserve">
     <value>龙之谷掉线器</value>
   </data>
+  <data name="MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage" xml:space="preserve">
+    <value>点我或按F4掉线</value>
+  </data>
   <data name="MainForm_InitializeButtons_ClickToKillProcessMessage" xml:space="preserve">
-    <value>点我切换至该窗口或按F4掉线</value>
+    <value>点我掉线</value>
   </data>
   <data name="MainForm_button_click_KillingProcessMessage" xml:space="preserve">
     <value>正在关闭此进程...</value>
@@ -137,5 +140,15 @@
   </data>
   <data name="MainForm_InitializeVersionLabel_Version" xml:space="preserve">
     <value>当前版本: 1.1.0</value>
+  </data>
+  <data name="MainForm_GetProcessButton_ProcessButtonTitle" xml:space="preserve">
+    <value>点我切换至该窗口</value>
+  </data>
+  <data name="MainForm_GetProcessButton_ProcessButtonHighlightedTitle" xml:space="preserve">
+    <value>当前窗口</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="alert" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\alert.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

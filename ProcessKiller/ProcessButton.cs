@@ -6,28 +6,33 @@ namespace ProcessKiller
     using System.Windows.Forms;
     using System.Diagnostics;
     using System.Threading.Tasks;
-    using Properties;
     using System.Drawing;
 
     class ProcessButton : Button
     {
         public Process Process;
-        private string _defaultText;
+        private readonly string _defaultText;
+        private readonly string _highlightedText;
         private bool _isHighlighted;
         private bool _showPerformanceCounter;
         private readonly Color _highlightColor;
         private readonly Color _unhighlightColor;
+        private readonly Color _disableColor;
+        private readonly string _killingMessage;
 
-        public ProcessButton(Color highlightColor, Color unhighlightColor)
+        public ProcessButton(Color highlightColor, Color unhighlightColor, Color disableColor, string killingMessage, string defaultText, string highlightedText)
         {
             _highlightColor = highlightColor;
             _unhighlightColor = unhighlightColor;
+            _disableColor = disableColor;
+            _killingMessage = killingMessage;
+            _defaultText = defaultText;
+            _highlightedText = highlightedText;
         }
 
         public void ShowPerformanceCounter()
         {
             _showPerformanceCounter = true;
-            _defaultText = this.Text;
 
             Task.Run(() =>
             {
@@ -73,7 +78,7 @@ namespace ProcessKiller
                     {
                         this.BeginInvoke(new MethodInvoker(() =>
                         {
-                            this.Text = _defaultText + Environment.NewLine + displayText;
+                            this.Text = (_isHighlighted ? _highlightedText : _defaultText) + Environment.NewLine + displayText;
                         }));
                     }
                 }
@@ -113,22 +118,29 @@ namespace ProcessKiller
         public void KillProcess()
         {
             this.Enabled = false;
+            this.BackColor = _disableColor;
             this.HidePerformanceCounter();
-            this.Text = Resources.MainForm_button_click_KillingProcessMessage;
+            this.Text = _killingMessage;
             this.Process.Kill();
         }
 
         public void Highlight()
         {
+            if (!Enabled) return;
             _isHighlighted = true;
-            this.Select();
+            this.ForeColor = Color.White;
             this.BackColor = _highlightColor;
+            //this.Text = _highlightedText;
+            this.Select();
         }
 
         public void Unhighlight()
         {
+            if (!Enabled) return;
             _isHighlighted = false;
+            this.ForeColor = Color.Black;
             this.BackColor = _unhighlightColor;
+            //this.Text = _defaultText;
         }
 
         public bool IsHighlighted()
@@ -155,6 +167,18 @@ namespace ProcessKiller
             }
             throw new Exception("Could not find performance counter " +
                 "instance name for current process. This is truly strange ...");
+        }
+
+        protected override bool ShowFocusCues => false;
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            // Draw Border using color specified in Flat Appearance
+            Pen pen = new Pen(Color.Gray, 1);
+            Rectangle rectangle = new Rectangle(0, 0, Size.Width - 1, Size.Height - 1);
+            e.Graphics.DrawRectangle(pen, rectangle);
         }
     }
 }
