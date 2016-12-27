@@ -22,13 +22,14 @@ namespace ProcessKiller
         private readonly WinEventHelper _winEvent;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
-        private const int DefaultProcessButtonHeight = 120;
+        private const int DefaultProcessButtonHeight = 130;
         private const int DefaultTimerButtonHeight = 100;
-        private const int DefaultProcessKillerButtonHeight = 50;
+        private const int DefaultProcessKillerButtonHeight = 40;
         private const int DefaultProcessNotFoundLabelHeight = 90;
         private const int DefaultCopyrightLabelHeight = 20;
-        private const int DefaultVersionInfoLabelHeight = 20;
+        private const int DefaultVersionInfoLabelHeight = 30;
         private const int DefaultClientRectangleWidth = 250;
+        private const int DefaultSettingsButtonHeight = 30;
 
         private const int DefaultCountDownInSeconds = 90;
         private const int DefaultCountDownAlertInSeconds = 15;
@@ -48,12 +49,16 @@ namespace ProcessKiller
 
         private readonly FontFamily _defaultFontFamily;
 
+        private Keys _processKillerKey, _countDownKey;
+
         private static readonly object _locker = new object();
-        private bool _clickToKillProcess = false;
+        private bool _listeningToKeyboardEvents = true;
 
         public MainForm()
         {
             InitializeComponent();
+
+            InitializeSettings();
 
             _defaultFontFamily = FontFamily.GenericSansSerif;
 
@@ -98,6 +103,12 @@ namespace ProcessKiller
             // hacky way to keep delegates alive
             GC.KeepAlive(_winEvent);
             GC.KeepAlive(_keyboardEventHook);
+        }
+
+        private void InitializeSettings()
+        {
+            Keys.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
+            Keys.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
         }
 
         private Label GetProcessNotFoundLabel(int width)
@@ -195,6 +206,24 @@ namespace ProcessKiller
             return button;
         }
 
+        private Button GetSettingsButton()
+        {
+            var button = new Button()
+            {
+                Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
+                Height = DefaultSettingsButtonHeight,
+                Font = new Font(_defaultFontFamily, 10, FontStyle.Regular),
+                Text = Resources.MainForm_GetSettingsButton_SettingsButtonTitle,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(6, 3, 6, 6),
+                BackColor = Color.LightGray,
+            };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += settings_button_click;
+
+            return button;
+        }
+
         private void InitializeControls(FlowLayoutPanel container)
         {
             var width = container.Width - container.Margin.All * 2;
@@ -232,6 +261,8 @@ namespace ProcessKiller
                 TimeSpan.FromSeconds(DefaultCountDownInSeconds), TimeSpan.FromSeconds(DefaultCountDownAlertInSeconds));
             _container.Controls.Add(_timerButton);
 
+            var settingsButton = GetSettingsButton();
+            container.Controls.Add(settingsButton);
             _copyrightLabel = GetCopyrightLabel(width);
             container.Controls.Add(_copyrightLabel);
             _versionInfoLabel = GetVersionInfoLabel(width);
@@ -362,15 +393,8 @@ namespace ProcessKiller
                 var processButton = sender as ProcessButton;
                 if (processButton == null) return;
 
-                if (_clickToKillProcess)
-                {
-                    processButton.KillProcess();
-                }
-                else
-                {
-                    processButton.Highlight();
-                    WinEventHelper.BringProcessToFront(processButton.Process);
-                }
+                processButton.Highlight();
+                WinEventHelper.BringProcessToFront(processButton.Process); 
             }
             catch (Exception ex)
             {
@@ -422,14 +446,14 @@ namespace ProcessKiller
 
         private void keyboard_key_down(object sender, KeyEventArgs e)
         {
-            if (IsDisposed || !this.IsHandleCreated) return;
+            if (IsDisposed || !this.IsHandleCreated || !_listeningToKeyboardEvents) return;
 
-            if (e.KeyCode == Keys.End)
+            Console.WriteLine(e.KeyCode);
+
+            if (e.KeyCode == _processKillerKey)
             {
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
-                    Console.WriteLine("Terminate key pressed");
-
                     if (_buttonsContainer.Controls.Count == 0) return;
                 
                     var processButtons = _buttonsContainer.Controls.OfType<ProcessButton>().ToList();
@@ -441,12 +465,10 @@ namespace ProcessKiller
                     killerButtonToClick?.PerformClick();
                 }));
             }
-            else if (e.KeyCode == Keys.F5)
+            else if (e.KeyCode == _countDownKey)
             {
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
-                    Console.WriteLine("Timer key pressed");
-
                     if (!_timerButton.Started())
                     {
                         _timerButton.StartTimer();
@@ -457,6 +479,20 @@ namespace ProcessKiller
                     }
                 }));
             }
+        }
+
+        private void settings_button_click(object sender, EventArgs e)
+        {
+            _listeningToKeyboardEvents = false;
+            var settingsForm = new SettingsForm {StartPosition = FormStartPosition.CenterParent};
+            settingsForm.Closed += settings_form_closed;
+            settingsForm.ShowDialog(this);
+        }
+
+        private void settings_form_closed(object sender, EventArgs e)
+        {
+            InitializeSettings();
+            _listeningToKeyboardEvents = true;
         }
 
         private void resize_end(object sender, EventArgs e)

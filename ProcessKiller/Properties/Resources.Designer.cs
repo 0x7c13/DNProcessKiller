@@ -97,7 +97,16 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 点我或按F4掉线.
+        ///   Looks up a localized string similar to 按键设置.
+        /// </summary>
+        internal static string MainForm_GetSettingsButton_SettingsButtonTitle {
+            get {
+                return ResourceManager.GetString("MainForm_GetSettingsButton_SettingsButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 点我或按键掉线.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage {
             get {
@@ -133,7 +142,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 当前版本: 1.1.0.
+        ///   Looks up a localized string similar to 当前版本: 1.2.0.
         /// </summary>
         internal static string MainForm_InitializeVersionLabel_Version {
             get {

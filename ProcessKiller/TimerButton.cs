@@ -1,6 +1,4 @@
 ﻿
-using ProcessKiller.Properties;
-
 namespace ProcessKiller
 {
     using System;
@@ -9,6 +7,7 @@ namespace ProcessKiller
     using System.Drawing;
     using System.Diagnostics;
     using System.Windows.Forms;
+    using ProcessKiller.Properties;
 
     class TimerButton : Button
     {
