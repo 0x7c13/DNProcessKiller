@@ -1,6 +1,7 @@
 ﻿
 namespace ProcessKiller
 {
+    using System.Collections.Generic;
     using System.Collections.Concurrent;
     using System.Windows.Forms;
     using System;
@@ -15,25 +16,49 @@ namespace ProcessKiller
     {
         private readonly ProcessMonitor _processMonitor;
         private Label _processNotFoundLabel, _copyrightLabel, _versionInfoLabel;
+        private TimerButton _timerButton;
         private readonly FlowLayoutPanel _container;
         private FlowLayoutPanel _buttonsContainer;
-        private readonly WinEventHookHelper _winEventHook;
+        private readonly WinEventHelper _winEvent;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
-        private const int DefaultProcessButtonHeight = 150;
+        private const int DefaultProcessButtonHeight = 130;
+        private const int DefaultTimerButtonHeight = 100;
+        private const int DefaultProcessKillerButtonHeight = 40;
         private const int DefaultProcessNotFoundLabelHeight = 90;
         private const int DefaultCopyrightLabelHeight = 20;
-        private const int DefaultVersionInfoLabelHeight = 20;
+        private const int DefaultVersionInfoLabelHeight = 30;
         private const int DefaultClientRectangleWidth = 250;
+        private const int DefaultSettingsButtonHeight = 30;
 
-        private readonly Color _buttonDefaultBackColor = ColorTranslator.FromHtml("#ecf0f1");
+        private const int DefaultCountDownInSeconds = 90;
+        private const int DefaultCountDownAlertInSeconds = 15;
+
+        private readonly Color _buttonDisabledBackColor = Color.LightGray;
+
+        private readonly Color _processButtonBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#89c4f4"), 0.9f);
+        private readonly Color _processButtonHighlightedBackColor = ColorTranslator.FromHtml("#4b77b1");
+
+        private readonly Color _processKillerBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#f1a9a0"), 0.9f);
+        private readonly Color _processKillerHighlightedBackColor = ColorTranslator.FromHtml("#e26a6a");
+
+        private readonly Color _timerDefaultTextColor = Color.Black;
+        private readonly Color _timerAlertTextColor = Color.DarkRed;
+        private readonly Color _timerDefaultBackColor = default(Color);
+        private readonly Color _timerRunningBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#87d37c"));
+
         private readonly FontFamily _defaultFontFamily;
 
+        private Keys _processKillerKey, _countDownKey;
+
         private static readonly object _locker = new object();
+        private bool _listeningToKeyboardEvents = true;
 
         public MainForm()
         {
             InitializeComponent();
+
+            InitializeSettings();
 
             _defaultFontFamily = FontFamily.GenericSansSerif;
 
@@ -65,10 +90,10 @@ namespace ProcessKiller
 
             _processMonitor.StartMonitoring();
 
-            _winEventHook = new WinEventHookHelper();
-            _winEventHook.OnWindowForegroundChanged += window_event_triggered;
-            _winEventHook.OnWindowMinimizeStart += window_event_triggered;
-            _winEventHook.OnWindowMinimizeEnd += window_event_triggered;
+            _winEvent = new WinEventHelper();
+            _winEvent.OnWindowForegroundChanged += window_event_triggered;
+            _winEvent.OnWindowMinimizeStart += window_event_triggered;
+            _winEvent.OnWindowMinimizeEnd += window_event_triggered;
 
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
@@ -76,8 +101,14 @@ namespace ProcessKiller
             this.ResizeEnd += resize_end;
 
             // hacky way to keep delegates alive
-            GC.KeepAlive(_winEventHook);
+            GC.KeepAlive(_winEvent);
             GC.KeepAlive(_keyboardEventHook);
+        }
+
+        private void InitializeSettings()
+        {
+            Keys.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
+            Keys.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
         }
 
         private Label GetProcessNotFoundLabel(int width)
@@ -118,23 +149,84 @@ namespace ProcessKiller
 
         private ProcessButton GetProcessButton(Process process)
         {
-            var button = new ProcessButton
+            var button = new ProcessButton(_processButtonHighlightedBackColor, _processButtonBackColor, _buttonDisabledBackColor, 
+                Resources.MainForm_button_click_KillingProcessMessage,
+                Resources.MainForm_GetProcessButton_ProcessButtonTitle + " (PID:" + process.Id + ")",
+                Resources.MainForm_GetProcessButton_ProcessButtonHighlightedTitle + " (PID:" + process.Id + ")")
             {
                 Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
                 Height = DefaultProcessButtonHeight,
-                Text = Resources.MainForm_InitializeButtons_ClickToKillProcessMessage + " (PID:" + process.Id + ")",
                 Font = new Font(_defaultFontFamily, 12, FontStyle.Regular),
-                BackColor = _buttonDefaultBackColor,
+                Text = Resources.MainForm_GetProcessButton_ProcessButtonTitle + " (PID:" + process.Id + ")",
                 Process = process,
+                Margin = new Padding(3, 5, 3, 1),
+                FlatStyle = FlatStyle.Flat,
             };
+            button.FlatAppearance.BorderSize = 0;
             button.Click += process_button_click;
             
             return button;
         }
 
+        private Button GetProcessKillerButton(ProcessButton processButton)
+        {
+            var button = new ProcessKillerButton(processButton, _processKillerHighlightedBackColor, _processKillerBackColor, _buttonDisabledBackColor,
+                Resources.MainForm_InitializeButtons_ClickToKillProcessMessage,
+                Resources.MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage,
+                Resources.MainForm_button_click_KillingProcessMessage
+                )
+            {
+                Width =DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
+                Height = DefaultProcessKillerButtonHeight,
+                Font = new Font(_defaultFontFamily, 11, FontStyle.Regular),
+                Margin = new Padding(3, 0, 3, 5),
+                Text = Resources.MainForm_InitializeButtons_ClickToKillProcessMessage,
+                FlatStyle = FlatStyle.Flat,
+            };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += process_killer_button_click;
+
+            return button;
+        }
+
+        private TimerButton GetTimerButton(int width, TimeSpan countDown, TimeSpan alertThreshold)
+        {
+            var button = new TimerButton(countDown, alertThreshold, _timerDefaultTextColor, _timerAlertTextColor, _timerRunningBackColor, _timerDefaultBackColor)
+            {
+                Width = width,
+                Height = DefaultTimerButtonHeight,
+                Font = new Font(_defaultFontFamily, 32, FontStyle.Regular),
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(6, 3, 6, 3),
+                Text = countDown.TotalSeconds.ToString("0"),
+            };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += timer_button_click;
+
+            return button;
+        }
+
+        private Button GetSettingsButton()
+        {
+            var button = new Button()
+            {
+                Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
+                Height = DefaultSettingsButtonHeight,
+                Font = new Font(_defaultFontFamily, 10, FontStyle.Regular),
+                Text = Resources.MainForm_GetSettingsButton_SettingsButtonTitle,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(6, 3, 6, 6),
+                BackColor = Color.LightGray,
+            };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += settings_button_click;
+
+            return button;
+        }
+
         private void InitializeControls(FlowLayoutPanel container)
         {
-            var width = container.Width;
+            var width = container.Width - container.Margin.All * 2;
 
             _processNotFoundLabel = GetProcessNotFoundLabel(width);
 
@@ -158,11 +250,19 @@ namespace ProcessKiller
             {
                 var process = _processMonitor.GetRunningProcesses()[i];
                 var button = GetProcessButton(process);
+                var killerButton = GetProcessKillerButton(button);
                 _buttonsContainer.Controls.Add(button);
+                _buttonsContainer.Controls.Add(killerButton);
                 button.ShowPerformanceCounter();
             }
             _container.Controls.Add(_buttonsContainer);
-            
+
+            _timerButton = GetTimerButton(width - container.Margin.All * 2, 
+                TimeSpan.FromSeconds(DefaultCountDownInSeconds), TimeSpan.FromSeconds(DefaultCountDownAlertInSeconds));
+            _container.Controls.Add(_timerButton);
+
+            var settingsButton = GetSettingsButton();
+            container.Controls.Add(settingsButton);
             _copyrightLabel = GetCopyrightLabel(width);
             container.Controls.Add(_copyrightLabel);
             _versionInfoLabel = GetVersionInfoLabel(width);
@@ -173,17 +273,28 @@ namespace ProcessKiller
 
         private void SetProcessButtonActiveByProcessId(uint pid)
         {
-            foreach (ProcessButton processButton in _buttonsContainer.Controls)
+            foreach (var processButton in _buttonsContainer.Controls.OfType<ProcessButton>())
             {
                 if (processButton.Process.Id == pid)
                 {
                     Console.WriteLine($"Process [{pid}] becomes active");
-                    processButton.Focus();
-                    processButton.BackColor = ColorTranslator.FromHtml("#87D37C");
+                    processButton.Highlight();
                 }
                 else
                 {
-                    processButton.BackColor = _buttonDefaultBackColor;
+                    processButton.Unhighlight();
+                }
+            }
+
+            foreach (var processKillerButton in _buttonsContainer.Controls.OfType<ProcessKillerButton>())
+            {
+                if (processKillerButton.ProcessButton.Process.Id == pid)
+                {
+                    processKillerButton.Highlight();
+                }
+                else
+                {
+                    processKillerButton.Unhighlight();
                 }
             }
         }
@@ -226,7 +337,7 @@ namespace ProcessKiller
             }
             else
             {
-                var pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
+                var pid = WinEventHelper.GetForegroundWindowThreadProcessId();
                 Console.WriteLine(pid);
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
@@ -245,19 +356,30 @@ namespace ProcessKiller
                 {
                     if (type == ProcessEventType.Start)
                     {
-                        var button = GetProcessButton(Process.GetProcessById((int) pid));
-                        _buttonsContainer?.Controls.Add(button);
+                        var process = Process.GetProcessById((int)pid);
+                        var button = GetProcessButton(process);
+                        var killerButton = GetProcessKillerButton(button);
+                        _buttonsContainer.Controls.Add(button);
+                        _buttonsContainer.Controls.Add(killerButton);
                         button.ShowPerformanceCounter();
                         SetProcessButtonActiveByProcessId(pid);
                     }
                     else if (type == ProcessEventType.Stop)
                     {
-                        var buttonToRemove = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(button => button.Process.Id == pid);
+                        var processButtons = _buttonsContainer.Controls.OfType<ProcessButton>().ToList();
+                        var processKillerButtons = _buttonsContainer.Controls.OfType<ProcessKillerButton>().ToList();
+
+                        var buttonToRemove = processButtons.FirstOrDefault(button => button.Process.Id == pid);
                         if (buttonToRemove == null) return;
 
                         buttonToRemove.HidePerformanceCounter();
                         _buttonsContainer?.Controls.Remove(buttonToRemove);
                         buttonToRemove.Dispose();
+
+                        var killerButtonToRemove = processKillerButtons.FirstOrDefault(button => button.ProcessButton.Process.Id == pid);
+                        if (killerButtonToRemove == null) return;
+                        _buttonsContainer?.Controls.Remove(killerButtonToRemove);
+                        killerButtonToRemove.Dispose();
                     }
                     ResizeWindowIfNeeded();
                 }));
@@ -271,14 +393,43 @@ namespace ProcessKiller
                 var processButton = sender as ProcessButton;
                 if (processButton == null) return;
 
-                processButton.Enabled = false;
-                processButton.HidePerformanceCounter();
-                processButton.Text = Resources.MainForm_button_click_KillingProcessMessage;
-                processButton.Process.Kill();
+                processButton.Highlight();
+                WinEventHelper.BringProcessToFront(processButton.Process); 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        private void process_killer_button_click(object sender, EventArgs e)
+        {
+            try
+            {
+                var processKillerButton = sender as ProcessKillerButton;
+                if (processKillerButton == null) return;
+
+                processKillerButton.KillProcess();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+        private void timer_button_click(object sender, EventArgs e)
+        {
+            var timerButton = sender as TimerButton;
+
+            if (timerButton == null) return;
+
+            if (!timerButton.Started())
+            {
+                timerButton.StartTimer();
+            }
+            else
+            {
+                timerButton.StopTimer();
             }
         }
 
@@ -288,39 +439,65 @@ namespace ProcessKiller
 
             this.BeginInvoke(new MethodInvoker(() =>
             {
-                pid = WinEventHookHelper.GetForegroundWindowThreadProcessId();
+                pid = WinEventHelper.GetForegroundWindowThreadProcessId();
                 SetProcessButtonActiveByProcessId(pid);
             }));
         }
 
-        void keyboard_key_down(object sender, KeyEventArgs e)
+        private void keyboard_key_down(object sender, KeyEventArgs e)
         {
-            if (IsDisposed || !this.IsHandleCreated) return;
+            if (IsDisposed || !this.IsHandleCreated || !_listeningToKeyboardEvents) return;
 
-            if (e.KeyCode == Keys.F4)
+            Console.WriteLine(e.KeyCode);
+
+            if (e.KeyCode == _processKillerKey)
             {
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
-                    Console.WriteLine("Terminate key pressed");
-
                     if (_buttonsContainer.Controls.Count == 0) return;
+                
+                    var processButtons = _buttonsContainer.Controls.OfType<ProcessButton>().ToList();
+                    var processKillerButtons = _buttonsContainer.Controls.OfType<ProcessKillerButton>().ToList();
 
-                    if (_buttonsContainer.Controls.Count == 1)
+                    var buttonToClick = processButtons.FirstOrDefault(processButton => processButton.IsHighlighted());
+                    if (buttonToClick == null) return;
+                    var killerButtonToClick = processKillerButtons.FirstOrDefault(processButton => processButton.ProcessButton.Process.Id == buttonToClick.Process.Id);
+                    killerButtonToClick?.PerformClick();
+                }));
+            }
+            else if (e.KeyCode == _countDownKey)
+            {
+                this.BeginInvoke(new MethodInvoker(() =>
+                {
+                    if (!_timerButton.Started())
                     {
-                        ((ProcessButton)_buttonsContainer.Controls[0]).PerformClick();
+                        _timerButton.StartTimer();
                     }
                     else
                     {
-                        Button buttonToClick = _buttonsContainer.Controls.Cast<ProcessButton>().FirstOrDefault(processButton => processButton.Focused);
-                        buttonToClick?.PerformClick();
+                        _timerButton.StopTimer();
                     }
                 }));
             }
         }
+
+        private void settings_button_click(object sender, EventArgs e)
+        {
+            _listeningToKeyboardEvents = false;
+            var settingsForm = new SettingsForm {StartPosition = FormStartPosition.CenterParent};
+            settingsForm.Closed += settings_form_closed;
+            settingsForm.ShowDialog(this);
+        }
+
+        private void settings_form_closed(object sender, EventArgs e)
+        {
+            InitializeSettings();
+            _listeningToKeyboardEvents = true;
+        }
+
         private void resize_end(object sender, EventArgs e)
         {
             ResizeWindowIfNeeded();
         }
-
     }
 }

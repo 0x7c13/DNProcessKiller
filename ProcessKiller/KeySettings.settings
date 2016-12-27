@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProcessKiller" GeneratedClassName="KeySettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ProcessKillerKey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">115</Value>
+    </Setting>
+    <Setting Name="CountDownKey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">116</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

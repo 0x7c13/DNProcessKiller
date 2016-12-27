@@ -6,7 +6,7 @@ namespace ProcessKiller
     using System.Text;
     using System.Diagnostics;
 
-    public class WinEventHookHelper: IDisposable
+    public class WinEventHelper: IDisposable
     {
         public event WindowEventHandler OnWindowForegroundChanged, OnWindowMinimizeStart, OnWindowMinimizeEnd;
         public delegate void WindowEventHandler(uint pid);
@@ -20,16 +20,26 @@ namespace ProcessKiller
             EVENT_SYSTEM_FOREGROUND = 0x0003
         }
 
+        private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
+        private const int SW_RESTORE = 9;
+
         [DllImport("user32.dll")]
         static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
 
         [DllImport("User32.dll")]
         public static extern IntPtr UnhookWindowsHookEx(IntPtr hHook);
 
-        private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
-
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern Int32 GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        [System.Runtime.InteropServices.DllImport("User32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr handle);
+
+        [System.Runtime.InteropServices.DllImport("User32.dll")]
+        private static extern bool ShowWindow(IntPtr handle, int nCmdShow);
+
+        [System.Runtime.InteropServices.DllImport("User32.dll")]
+        private static extern bool IsIconic(IntPtr handle);
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
@@ -38,7 +48,7 @@ namespace ProcessKiller
         private bool _disposed;
         private readonly WinEventDelegate _winEventDelegate;
 
-        public WinEventHookHelper()
+        public WinEventHelper()
         {
             _winEventDelegate = new WinEventDelegate(WinEventProc);;
             _hook = SetWinEventHook((uint)SystemEvents.EVENT_SYSTEM_FOREGROUND, (uint)SystemEvents.EVENT_SYSTEM_DESTROY, IntPtr.Zero, _winEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
@@ -49,6 +59,17 @@ namespace ProcessKiller
             uint procId = 0;
             GetWindowThreadProcessId(GetForegroundWindow(), out procId);
             return procId;
+        }
+
+        public static void BringProcessToFront(Process process)
+        {
+            IntPtr handle = process.MainWindowHandle;
+            if (IsIconic(handle))
+            {
+                ShowWindow(handle, SW_RESTORE);
+            }
+
+            SetForegroundWindow(handle);
         }
 
         private void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
@@ -92,7 +113,7 @@ namespace ProcessKiller
             _disposed = true;
         }
 
-        ~WinEventHookHelper()
+        ~WinEventHelper()
         {
             Dispose();
         }

@@ -61,6 +61,15 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream alert {
+            get {
+                return ResourceManager.GetStream("alert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 正在关闭此进程....
         /// </summary>
         internal static string MainForm_button_click_KillingProcessMessage {
@@ -70,7 +79,43 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 点我或按F4掉线.
+        ///   Looks up a localized string similar to 当前窗口.
+        /// </summary>
+        internal static string MainForm_GetProcessButton_ProcessButtonHighlightedTitle {
+            get {
+                return ResourceManager.GetString("MainForm_GetProcessButton_ProcessButtonHighlightedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 点我切换至该窗口.
+        /// </summary>
+        internal static string MainForm_GetProcessButton_ProcessButtonTitle {
+            get {
+                return ResourceManager.GetString("MainForm_GetProcessButton_ProcessButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 按键设置.
+        /// </summary>
+        internal static string MainForm_GetSettingsButton_SettingsButtonTitle {
+            get {
+                return ResourceManager.GetString("MainForm_GetSettingsButton_SettingsButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 点我或按键掉线.
+        /// </summary>
+        internal static string MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage {
+            get {
+                return ResourceManager.GetString("MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 点我掉线.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessMessage {
             get {
@@ -97,7 +142,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 当前版本: 1.1.0.
+        ///   Looks up a localized string similar to 当前版本: 1.2.0.
         /// </summary>
         internal static string MainForm_InitializeVersionLabel_Version {
             get {
