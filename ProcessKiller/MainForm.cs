@@ -455,7 +455,7 @@ namespace ProcessKiller
                 if (instanceCount > 0)
                 {
                     fileName = $"{Resources.DragonNest_Exe_Name}-PK-{instanceCount}";
-                    _copyFileIfNotFound(Path.Combine(_gameDicPath, Resources.DragonNest_Exe_Name + ".exe"), Path.Combine(_gameDicPath, fileName +".exe"));
+                    File.Copy(Path.Combine(_gameDicPath, Resources.DragonNest_Exe_Name + ".exe"), Path.Combine(_gameDicPath, fileName +".exe"), overwrite: true);
                     _setCompatFlags(Path.Combine(_gameDicPath, fileName + ".exe"));
                 }
 
@@ -553,14 +553,6 @@ namespace ProcessKiller
             var layersKey = appCompactFlagsKey?.OpenSubKey("Layers", true);
 
             layersKey?.SetValue(file, "~ RUNASADMIN HIGHDPIAWARE");
-        }
-
-        private void _copyFileIfNotFound(string from, string to)
-        {
-            if (!File.Exists(to))
-            {
-                File.Copy(from, to);
-            }
         }
 
         private void _extractHandleExeToTempFolderIfNotFound(string filePath)
