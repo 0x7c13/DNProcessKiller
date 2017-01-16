@@ -11,51 +11,82 @@ namespace ProcessKiller
     using System.Runtime.InteropServices;
     using System.Text;
     using Properties;
+    using System.IO;
+    using System.Threading.Tasks;
+    using Microsoft.Win32;
+    using System.Threading;
 
     public partial class MainForm : Form
     {
         private readonly ProcessMonitor _processMonitor;
-        private Label _processNotFoundLabel, _copyrightLabel, _versionInfoLabel;
+        private Button _startGameButton;
+        private Label _copyrightLabel;
+        private LinkLabel _versionInfoLabel;
         private TimerButton _timerButton;
         private readonly FlowLayoutPanel _container;
         private FlowLayoutPanel _buttonsContainer;
         private readonly WinEventHelper _winEvent;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
 
-        private const int DefaultProcessButtonHeight = 130;
-        private const int DefaultTimerButtonHeight = 100;
+        private const int DefaultProcessButtonHeight = 120;
+        private const int DefaultTimerButtonHeight = 80;
         private const int DefaultProcessKillerButtonHeight = 40;
-        private const int DefaultProcessNotFoundLabelHeight = 90;
         private const int DefaultCopyrightLabelHeight = 20;
         private const int DefaultVersionInfoLabelHeight = 30;
         private const int DefaultClientRectangleWidth = 250;
         private const int DefaultSettingsButtonHeight = 30;
+        private const int DefaultStartGameButtonHeight = 50;
 
         private const int DefaultCountDownInSeconds = 90;
         private const int DefaultCountDownAlertInSeconds = 15;
 
-        private readonly Color _buttonDisabledBackColor = Color.LightGray;
+        private readonly Color _buttonDisabledBackColor = Color.DimGray;
 
-        private readonly Color _processButtonBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#89c4f4"), 0.9f);
+        private readonly Color _startGameButtonBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#446CB3"), 0.8f);
+
+        private readonly Color _processButtonBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#89c4f4"), 0.5f);
         private readonly Color _processButtonHighlightedBackColor = ColorTranslator.FromHtml("#4b77b1");
 
-        private readonly Color _processKillerBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#f1a9a0"), 0.9f);
+        private readonly Color _processKillerBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#f1a9a0"), 0.5f);
         private readonly Color _processKillerHighlightedBackColor = ColorTranslator.FromHtml("#e26a6a");
 
-        private readonly Color _timerDefaultTextColor = Color.Black;
+        private readonly Color _timerDefaultTextColor = Color.White;
         private readonly Color _timerAlertTextColor = Color.DarkRed;
-        private readonly Color _timerDefaultBackColor = default(Color);
-        private readonly Color _timerRunningBackColor = ControlPaint.Light(ColorTranslator.FromHtml("#87d37c"));
+        private readonly Color _timerDefaultBackColor = Color.DimGray;
+        private readonly Color _timerRunningBackColor = ControlPaint.Dark(ColorTranslator.FromHtml("#87d37c"), 0.0f);
 
         private readonly FontFamily _defaultFontFamily;
 
         private Keys _processKillerKey, _countDownKey;
+        private string _gameDicPath;
 
         private static readonly object _locker = new object();
         private bool _listeningToKeyboardEvents = true;
 
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HTCAPTION = 0x2;
+
+        [DllImport("User32.dll")]
+        public static extern bool ReleaseCapture();
+
+        [DllImport("User32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                const int CS_DROPSHADOW = 0x20000;
+                CreateParams cp = base.CreateParams;
+                cp.ClassStyle |= CS_DROPSHADOW;
+                return cp;
+            }
+        }
+
         public MainForm()
         {
+            this.Text = Resources.ApplicationName;
+
             InitializeComponent();
 
             InitializeSettings();
@@ -70,11 +101,13 @@ namespace ProcessKiller
             {
                 // ignore
             }
-
-            _processMonitor = new ProcessMonitor("dragonnest");
-            //_processMonitor = new ProcessMonitor("notepad");
+        
+            _processMonitor = new ProcessMonitor(Resources.DragonNest_Exe_Name);
 
             _processMonitor.OnEventArrived += event_arrived;
+
+            InitializeTitleBar();
+
             _container = new FlowLayoutPanel()
             {
                 AutoSize = true,
@@ -82,6 +115,7 @@ namespace ProcessKiller
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 Width = DefaultClientRectangleWidth,
+                Padding = new Padding(0, this.TitleBar.Height, 0, 3),
             };
 
             this.Controls.Add(_container);
@@ -105,22 +139,43 @@ namespace ProcessKiller
             GC.KeepAlive(_keyboardEventHook);
         }
 
-        private void InitializeSettings()
+        private void InitializeTitleBar()
         {
-            Keys.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
-            Keys.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
+            this.TitleBarLabel.MouseDown += window_mouse_down;
         }
 
-        private Label GetProcessNotFoundLabel(int width)
+        private void window_mouse_down(object sender, MouseEventArgs e)
         {
-            return new Label
+            if (e.Button == MouseButtons.Left)
             {
-                Width = width,
-                Height = DefaultProcessNotFoundLabelHeight,
-                Text = Resources.MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage,
-                Font = new Font(_defaultFontFamily, 10, FontStyle.Regular),
-                TextAlign = ContentAlignment.MiddleCenter,
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+            }
+        }
+
+        private void InitializeSettings()
+        {
+            Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
+            Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
+            _gameDicPath = _getGameDir();
+        }
+
+        private Button GetStartGameButton()
+        {
+            var button = new NoFocusCueButton()
+            {
+                Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
+                Height = DefaultStartGameButtonHeight,
+                Font = new Font(_defaultFontFamily, 12, FontStyle.Regular),
+                Text = Resources.MainForm_GetStartGameButton_title,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(6, 9, 6, 0),
+                BackColor = _startGameButtonBackColor,
             };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += start_game_button_click;
+
+            return button;
         }
 
         private Label GetCopyrightLabel(int width)
@@ -132,18 +187,23 @@ namespace ProcessKiller
                 Text = Resources.MainForm_InitializeCopyRightLabel_CopyrightMessage,
                 Font = new Font(_defaultFontFamily, 9, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.White,
             };
         }
 
-        private Label GetVersionInfoLabel(int width)
+        private LinkLabel GetVersionInfoLabel(int width)
         {
-            return new Label
+            return new LinkLabel()
             {
                 Width = width,
                 Height = DefaultVersionInfoLabelHeight,
                 Text = Resources.MainForm_InitializeVersionLabel_Version,
                 Font = new Font(_defaultFontFamily, 8, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.White,
+                LinkColor = Color.White,
+                ActiveLinkColor = Color.Gray,
+                LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline,
             };
         }
 
@@ -197,8 +257,10 @@ namespace ProcessKiller
                 Height = DefaultTimerButtonHeight,
                 Font = new Font(_defaultFontFamily, 32, FontStyle.Regular),
                 FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(6, 3, 6, 3),
+                Margin = new Padding(6, 0, 6, 3),
                 Text = countDown.TotalSeconds.ToString("0"),
+                BackColor = _timerDefaultBackColor,
+                ForeColor = _timerDefaultTextColor,
             };
             button.FlatAppearance.BorderSize = 0;
             button.Click += timer_button_click;
@@ -208,7 +270,7 @@ namespace ProcessKiller
 
         private Button GetSettingsButton()
         {
-            var button = new Button()
+            var button = new NoFocusCueButton()
             {
                 Width = DefaultClientRectangleWidth - (_buttonsContainer.Padding.Left + _buttonsContainer.Margin.Left + _container.Padding.Left + _container.Margin.Left) * 2,
                 Height = DefaultSettingsButtonHeight,
@@ -216,19 +278,16 @@ namespace ProcessKiller
                 Text = Resources.MainForm_GetSettingsButton_SettingsButtonTitle,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(6, 3, 6, 6),
-                BackColor = Color.LightGray,
+                BackColor = Color.DarkGray,
             };
             button.FlatAppearance.BorderSize = 0;
             button.Click += settings_button_click;
-
             return button;
         }
 
         private void InitializeControls(FlowLayoutPanel container)
         {
             var width = container.Width - container.Margin.All * 2;
-
-            _processNotFoundLabel = GetProcessNotFoundLabel(width);
 
             _buttonsContainer = new FlowLayoutPanel()
             {
@@ -240,11 +299,9 @@ namespace ProcessKiller
             _buttonsContainer.ControlAdded += process_button_added;
             _buttonsContainer.ControlRemoved += process_button_removed;
 
-            if (_processMonitor.GetRunningProcesses().Count > 0)
-            {
-                _processNotFoundLabel.Hide();
-            }
-            container.Controls.Add(_processNotFoundLabel);
+            _startGameButton = GetStartGameButton();
+
+            container.Controls.Add(_startGameButton);
 
             for (var i = 0; i < _processMonitor.GetRunningProcesses().Count; i++)
             {
@@ -264,11 +321,18 @@ namespace ProcessKiller
             var settingsButton = GetSettingsButton();
             container.Controls.Add(settingsButton);
             _copyrightLabel = GetCopyrightLabel(width);
+            _copyrightLabel.MouseDown += window_mouse_down;
             container.Controls.Add(_copyrightLabel);
             _versionInfoLabel = GetVersionInfoLabel(width);
+            _versionInfoLabel.LinkClicked += link_clicked;
             container.Controls.Add(_versionInfoLabel);
 
             ResizeWindowIfNeeded();
+        }
+
+        private void link_clicked(object sender, EventArgs e)
+        {
+            Process.Start(Resources.Application_Web_HomePage);
         }
 
         private void SetProcessButtonActiveByProcessId(uint pid)
@@ -277,7 +341,7 @@ namespace ProcessKiller
             {
                 if (processButton.Process.Id == pid)
                 {
-                    Console.WriteLine($"Process [{pid}] becomes active");
+                    //Console.WriteLine($"Process [{pid}] becomes active");
                     processButton.Highlight();
                 }
                 else
@@ -301,12 +365,10 @@ namespace ProcessKiller
 
         private void ResizeWindowIfNeeded()
         {
-            var height = (from Control control in _container.Controls select control.Height).Sum() + _container.Margin.All * (_container.Controls.Count + 2);
-            if (_buttonsContainer.Controls.Count > 0)
-            {
-                height -= DefaultProcessNotFoundLabelHeight;
-                height -= _container.Margin.All;
-            }
+            var height = this.TitleBar.Height + 
+                (from Control control in _container.Controls select control.Height).Sum() + 
+                _container.Margin.All * (_container.Controls.Count + 2) 
+                + _container.Margin.All * 2;
 
             if (DefaultClientRectangleWidth != this.ClientSize.Width || height != this.ClientSize.Height)
             {
@@ -317,28 +379,16 @@ namespace ProcessKiller
         private void process_button_added(object sender, ControlEventArgs e)
         {
             if (IsDisposed || !this.IsHandleCreated) return;
-
-            this.BeginInvoke(new MethodInvoker(() =>
-            {
-                _processNotFoundLabel.Hide();
-            }));
         }
 
         private void process_button_removed(object sender, ControlEventArgs e)
         {
             if (IsDisposed || !this.IsHandleCreated) return;
 
-            if (_buttonsContainer.Controls.Count == 0)
-            {
-                this.BeginInvoke(new MethodInvoker(() =>
-                {
-                    _processNotFoundLabel.Show();
-                }));
-            }
-            else
+            if (_buttonsContainer.Controls.Count != 0)
             {
                 var pid = WinEventHelper.GetForegroundWindowThreadProcessId();
-                Console.WriteLine(pid);
+                //Console.WriteLine(pid);
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
                     SetProcessButtonActiveByProcessId(pid);
@@ -381,8 +431,149 @@ namespace ProcessKiller
                         _buttonsContainer?.Controls.Remove(killerButtonToRemove);
                         killerButtonToRemove.Dispose();
                     }
+
                     ResizeWindowIfNeeded();
                 }));
+            }
+        }
+
+        private void start_game_button_click(object sender, EventArgs e)
+        {
+            _startGameButton.Enabled = false;
+
+            try
+            {
+                if (string.IsNullOrEmpty(_gameDicPath))
+                {
+                    throw new FileNotFoundException(Resources.DNExe_NotFound_Message);
+                }
+
+                string fileName = Resources.DragonNest_LauncherExe_Name;
+
+                var instanceCount = _processMonitor.GetRunningProcesses().Count;
+
+                if (instanceCount > 0)
+                {
+                    fileName = $"{Resources.DragonNest_Exe_Name}-PK-{instanceCount}";
+                    _copyFileIfNotFound(Path.Combine(_gameDicPath, Resources.DragonNest_Exe_Name + ".exe"), Path.Combine(_gameDicPath, fileName +".exe"));
+                    _setCompatFlags(Path.Combine(_gameDicPath, fileName + ".exe"));
+                }
+
+                string handleExePath = Path.Combine(_gameDicPath, "handle.exe");
+
+                var serverName = KeySettings.Default.ServerName;
+                if (string.IsNullOrEmpty(serverName))
+                {
+                    throw new Exception(Resources.DNServer_NotFound_Message);
+                }
+
+                var serverList = DNServerInfo.GetServerListFromResource();
+                var server = serverList.First(s => string.Equals(serverName, s.Name));
+
+                string args = $"/ip:{server.IpAddress} /port:{server.Port} /Lver:2 /use_packing";
+
+                var handleFile = Path.Combine(_gameDicPath, "handle.exe");
+                _extractHandleExeToTempFolderIfNotFound(handleFile);
+
+                var appLauncher = new MutexAppLauncher(handleExePath, Resources.DragonNest_Exe_Name);
+                appLauncher.Launch(_gameDicPath, fileName, args);
+
+                if (KeySettings.Default.IsFirstTimeClickOnStartButton)
+                {
+                    MessageBox.Show(Resources.MainForm_start_game_button_first_click_message, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    KeySettings.Default.IsFirstTimeClickOnStartButton = false;
+                    KeySettings.Default.Save();
+                }
+                _startGameButton.Text = Resources.MainForm_start_game_button_game_start_message;
+
+                AppTracker.TrackEvent("AppLauncher", $"Launch_Instance_{instanceCount + 1}");
+            }
+            catch (Exception ex)
+            {
+                _startGameButton.Enabled = true;
+                _startGameButton.Text = Resources.MainForm_GetStartGameButton_title;
+                Console.WriteLine(ex);
+                MessageBox.Show(ex.Message, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            Task.Run(() =>
+            {
+                Thread.Sleep(20 * 1000);
+                if (IsDisposed || !this.IsHandleCreated) return;
+
+                this.BeginInvoke(new MethodInvoker(() =>
+                {
+                    _startGameButton.Text = Resources.MainForm_GetStartGameButton_title;
+                    _startGameButton.Enabled = true;
+                }));
+            });
+        }
+
+        private string _getGameDir()
+        {
+            if (!string.IsNullOrEmpty(KeySettings.Default.GameDicPath))
+            {
+                return KeySettings.Default.GameDicPath;
+            }
+
+            // try get the game dic from registry
+            var regPath = Resources.DragonNest_Registry_Path;
+            var key = Registry.LocalMachine.OpenSubKey(regPath);
+
+            var gameDir = key?.GetValue("Path")?.ToString();
+
+            if (string.IsNullOrEmpty(gameDir))
+            {
+                return string.Empty;
+            }
+
+            if (File.Exists(Path.Combine(gameDir, Resources.DragonNest_LauncherExe_Name + ".exe")) &&
+                File.Exists(Path.Combine(gameDir, Resources.DragonNest_Exe_Name + ".exe")))
+            {
+                _gameDicPath = gameDir;
+                KeySettings.Default.GameDicPath = gameDir;
+                KeySettings.Default.Save();
+                return gameDir;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        // Set compatibility flags
+        // HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
+        private void _setCompatFlags(string file)
+        {
+            var softwareKey = Registry.CurrentUser.OpenSubKey("Software", true);
+            var microsoftKey = softwareKey?.OpenSubKey("Microsoft", true);
+            var winNtKey = microsoftKey?.OpenSubKey("Windows NT", true);
+            var currentVersionKey = winNtKey?.OpenSubKey("CurrentVersion", true);
+            var appCompactFlagsKey = currentVersionKey?.OpenSubKey("AppCompatFlags", true);
+            var layersKey = appCompactFlagsKey?.OpenSubKey("Layers", true);
+
+            layersKey?.SetValue(file, "~ RUNASADMIN HIGHDPIAWARE");
+        }
+
+        private void _copyFileIfNotFound(string from, string to)
+        {
+            if (!File.Exists(to))
+            {
+                File.Copy(from, to);
+            }
+        }
+
+        private void _extractHandleExeToTempFolderIfNotFound(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                using (Stream resource = new MemoryStream(Resources.handle))
+                {
+                    using (Stream output = File.OpenWrite(filePath))
+                    {
+                        resource.CopyTo(output);
+                    }
+                }
             }
         }
 
@@ -448,7 +639,7 @@ namespace ProcessKiller
         {
             if (IsDisposed || !this.IsHandleCreated || !_listeningToKeyboardEvents) return;
 
-            Console.WriteLine(e.KeyCode);
+            //Console.WriteLine(e.KeyCode);
 
             if (e.KeyCode == _processKillerKey)
             {
@@ -462,7 +653,7 @@ namespace ProcessKiller
                     var buttonToClick = processButtons.FirstOrDefault(processButton => processButton.IsHighlighted());
                     if (buttonToClick == null) return;
                     var killerButtonToClick = processKillerButtons.FirstOrDefault(processButton => processButton.ProcessButton.Process.Id == buttonToClick.Process.Id);
-                    killerButtonToClick?.PerformClick();
+                    process_killer_button_click(killerButtonToClick, null);
                 }));
             }
             else if (e.KeyCode == _countDownKey)
@@ -487,6 +678,16 @@ namespace ProcessKiller
             var settingsForm = new SettingsForm {StartPosition = FormStartPosition.CenterParent};
             settingsForm.Closed += settings_form_closed;
             settingsForm.ShowDialog(this);
+        }
+
+        private void exit_button_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void minimize_button_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
 
         private void settings_form_closed(object sender, EventArgs e)

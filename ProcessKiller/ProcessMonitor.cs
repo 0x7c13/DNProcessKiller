@@ -32,7 +32,16 @@ namespace ProcessKiller
         public ProcessMonitor(string processName)
         {
             _processName = processName;
-            _runningProcesses = Process.GetProcessesByName(_processName).ToList();
+            _runningProcesses = new List<Process>();
+
+            var allProcess = Process.GetProcesses();
+            foreach (var process in allProcess)
+            {
+                if (process.ProcessName.ToLower().Contains(processName.ToLower()))
+                {
+                    _runningProcesses.Add(process);
+                }
+            }
             Console.WriteLine($"Found {_runningProcesses.Count} instance running");
         }
 
@@ -87,7 +96,7 @@ namespace ProcessKiller
                 var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
                 var pId = uint.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
 
-                if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
+                if (pName.ToLower().Contains(_processName.ToLower()))
                 {
                     Console.WriteLine($"Process started: {pName} [{pId}]", pName);
                     var process = Process.GetProcessById((int)pId);
@@ -111,7 +120,7 @@ namespace ProcessKiller
                 var pName = Path.GetFileNameWithoutExtension(e.NewEvent.Properties["ProcessName"].Value.ToString());
                 var pId = uint.Parse(e.NewEvent.Properties["ProcessId"].Value.ToString());
 
-                if (string.Equals(_processName, pName, StringComparison.CurrentCultureIgnoreCase))
+                if (pName.ToLower().Contains(_processName.ToLower()))
                 {
                     Console.WriteLine($"Process stopped: {pName} [{pId}]", pName);
 

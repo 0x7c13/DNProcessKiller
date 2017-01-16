@@ -120,8 +120,8 @@
   <data name="Program_ShowAdminErrorDialogBox_AdminPrivilegeMessage" xml:space="preserve">
     <value>请右键以管理员身份打开此程序</value>
   </data>
-  <data name="Program_ShowAdminErrorDialogBox_ApplicationName" xml:space="preserve">
-    <value>龙之谷掉线器</value>
+  <data name="ApplicationName" xml:space="preserve">
+    <value>小猪多开器</value>
   </data>
   <data name="MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage" xml:space="preserve">
     <value>点我或按键掉线</value>
@@ -132,14 +132,11 @@
   <data name="MainForm_button_click_KillingProcessMessage" xml:space="preserve">
     <value>正在关闭此进程...</value>
   </data>
-  <data name="MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage" xml:space="preserve">
-    <value>未发现龙之谷进程，列表将在游戏启动后自动更新，无须重启本程序。</value>
-  </data>
   <data name="MainForm_InitializeCopyRightLabel_CopyrightMessage" xml:space="preserve">
-    <value>南方电信一区 柒才 flyingeek@live.com</value>
+    <value>南方电信一区 柒才 &lt;女神之瞳&gt;</value>
   </data>
   <data name="MainForm_InitializeVersionLabel_Version" xml:space="preserve">
-    <value>当前版本: 1.2.0</value>
+    <value>当前版本: 1.3.0 (2017/01/16)</value>
   </data>
   <data name="MainForm_GetProcessButton_ProcessButtonTitle" xml:space="preserve">
     <value>点我切换至该窗口</value>
@@ -152,6 +149,48 @@
     <value>..\Resources\alert.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="MainForm_GetSettingsButton_SettingsButtonTitle" xml:space="preserve">
-    <value>按键设置</value>
+    <value>设置</value>
+  </data>
+  <data name="MainForm_GetStartGameButton_title" xml:space="preserve">
+    <value>启动游戏</value>
+  </data>
+  <data name="DragonNest_Exe_Name" xml:space="preserve">
+    <value>DragonNest</value>
+  </data>
+  <data name="DragonNest_LauncherExe_Name" xml:space="preserve">
+    <value>dnlauncher</value>
+  </data>
+  <data name="DragonNest_Registry_Path" xml:space="preserve">
+    <value>SOFTWARE\WOW6432Node\shandagames\DragonNest</value>
+  </data>
+  <data name="handle" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\handle.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="servers" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\servers.ini;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WINNT_AppCompatFlags_Registry_Path" xml:space="preserve">
+    <value>HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers</value>
+  </data>
+  <data name="SettingsForm_PathSelection_Description" xml:space="preserve">
+    <value>请选择龙之谷游戏文件夹(包含游戏启动程序的根目录)</value>
+  </data>
+  <data name="SettingsForm_PathSelection_InvalidPath_Message" xml:space="preserve">
+    <value>未在该目录下发现龙之谷启动程序，请选择含有龙之谷启动程序的游戏目录</value>
+  </data>
+  <data name="MainForm_start_game_button_game_start_message" xml:space="preserve">
+    <value>游戏启动中...</value>
+  </data>
+  <data name="DNExe_NotFound_Message" xml:space="preserve">
+    <value>未找到龙之谷主程序路径[DragonNest.exe], 请在设置中手动添加主程序路径</value>
+  </data>
+  <data name="DNServer_NotFound_Message" xml:space="preserve">
+    <value>服务器未选择，请在设置中选择大区</value>
+  </data>
+  <data name="MainForm_start_game_button_first_click_message" xml:space="preserve">
+    <value>如果需要多开，请等游戏完全启动或登陆后再点击启动游戏按钮</value>
+  </data>
+  <data name="Application_Web_HomePage" xml:space="preserve">
+    <value>http://bbs.duowan.com/forum.php?mod=viewthread&amp;tid=45386278&amp;fromuid=38312866</value>
   </data>
 </root>
