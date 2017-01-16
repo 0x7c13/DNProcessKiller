@@ -28,7 +28,7 @@ namespace ProcessKiller
             // check admin privilege
             if (IsAdministrator())
             {
-                AppTracker.TrackPageView("Application", "Start");
+                AppTracker.TrackEvent("Application", "Start");
                 Application.Run(new MainForm());
             }
             else
