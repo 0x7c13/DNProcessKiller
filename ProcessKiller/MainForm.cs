@@ -454,7 +454,8 @@ namespace ProcessKiller
 
                 if (instanceCount > 0)
                 {
-                    fileName = $"{Resources.DragonNest_Exe_Name}-PK-{instanceCount}";
+                    var instanceId = _getNextAvailableInstanceId(instanceCount);
+                    fileName = $"{Resources.DragonNest_Exe_Name}-PK-{instanceId}";
                     File.Copy(Path.Combine(_gameDicPath, Resources.DragonNest_Exe_Name + ".exe"), Path.Combine(_gameDicPath, fileName +".exe"), overwrite: true);
                     _setCompatFlags(Path.Combine(_gameDicPath, fileName + ".exe"));
                 }
@@ -507,6 +508,16 @@ namespace ProcessKiller
                     _startGameButton.Enabled = true;
                 }));
             });
+        }
+
+        private int _getNextAvailableInstanceId(int instanceCount)
+        {
+            var id = instanceCount;
+            while (true)
+            {
+                if (Process.GetProcessesByName($"{Resources.DragonNest_Exe_Name}-PK-{id}").Length == 0) return id;
+                id++;
+            }
         }
 
         private string _getGameDir()
