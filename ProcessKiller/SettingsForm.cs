@@ -2,6 +2,7 @@
 namespace ProcessKiller
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Data;
@@ -10,6 +11,8 @@ namespace ProcessKiller
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows.Forms;
+    using Microsoft.Win32;
+    using ProcessKiller.Properties;
 
     public partial class SettingsForm : Form
     {
@@ -27,7 +30,7 @@ namespace ProcessKiller
             InitializeSettings();
 
             this.MouseDown += SettingsForm_MouseDown;
-            this.SettingsGroupBox.MouseDown += SettingsForm_MouseDown;
+            this.KeySettingsGroupBox.MouseDown += SettingsForm_MouseDown;
             this.SettingsTable.MouseDown += SettingsForm_MouseDown;
             this.ProcessKillerButtonLabel.MouseDown += SettingsForm_MouseDown;
             this.CountDownButtonLabel.MouseDown += SettingsForm_MouseDown;
@@ -59,11 +62,26 @@ namespace ProcessKiller
             this.CountDownKeyTextBox.GotFocus += CountDownKeyTextBox_GotFocus;
             this.CountDownKeyTextBox.LostFocus += CountDownKeyTextBox_OnDeFocus;
 
-            Keys.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _userDefinedProcessKillerKey);
-            Keys.TryParse(KeySettings.Default.CountDownKey.ToString(), out _userDefinedCountDownKey);
+            Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _userDefinedProcessKillerKey);
+            Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _userDefinedCountDownKey);
+            var gameDicPath = KeySettings.Default.GameDicPath;
+            var serverName = KeySettings.Default.ServerName;
 
             this.ProcessKillerKeyTextbox.Text = _userDefinedProcessKillerKey.ToString();
             this.CountDownKeyTextBox.Text = _userDefinedCountDownKey.ToString();
+
+            if (!string.IsNullOrEmpty(gameDicPath))
+            {
+                this.GameDicPathTextBox.Text = gameDicPath;
+            }
+
+            var serverList = DNServerInfo.GetServerListFromResource();
+
+            this.ServerSelectionBox.Items.AddRange(serverList.Select(s => s.Name).ToArray());
+            if (!string.IsNullOrEmpty(serverName))
+            {
+                this.ServerSelectionBox.SelectedItem = serverName;
+            }
 
             this.CancelButton.Select();
         }
@@ -133,6 +151,27 @@ namespace ProcessKiller
             this.Close();
         }
 
+        private void PathSelectionButton_Click(object sender, EventArgs e)
+        {
+            var folderBrowserDialog = new FolderBrowserDialog
+            {
+                Description = Resources.SettingsForm_PathSelection_Description
+            };
+            var result = folderBrowserDialog.ShowDialog();
+
+            if (result != DialogResult.OK || string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath)) return;
+
+            if (File.Exists(Path.Combine(folderBrowserDialog.SelectedPath, Resources.DragonNest_LauncherExe_Name + ".exe")) &&
+                File.Exists(Path.Combine(folderBrowserDialog.SelectedPath, Resources.DragonNest_Exe_Name + ".exe")))
+            {
+                this.GameDicPathTextBox.Text = folderBrowserDialog.SelectedPath;
+            }
+            else
+            {
+                MessageBox.Show(Resources.SettingsForm_PathSelection_InvalidPath_Message, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+            
         private void SaveUserSettings()
         {
             if (!string.IsNullOrEmpty(this.ProcessKillerKeyTextbox.Text))
@@ -144,6 +183,21 @@ namespace ProcessKiller
             {
                 KeySettings.Default.CountDownKey = (int)_userDefinedCountDownKey;
             }
+
+            if (!string.IsNullOrEmpty(this.GameDicPathTextBox.Text))
+            {
+                KeySettings.Default.GameDicPath = this.GameDicPathTextBox.Text;
+            }
+
+            if (this.ServerSelectionBox.SelectedItem != null)
+            {
+                if (!string.Equals(this.ServerSelectionBox.Text, KeySettings.Default.ServerName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    AppTracker.TrackEvent("Settings", $"SetServer_{this.ServerSelectionBox.Text}");
+                }
+                KeySettings.Default.ServerName = this.ServerSelectionBox.SelectedItem.ToString();
+            }
+
             KeySettings.Default.Save(); // Saves settings in application configuration file
         }
     }

@@ -70,6 +70,79 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://bbs.duowan.com/forum.php?mod=viewthread&amp;tid=45386278&amp;fromuid=38312866.
+        /// </summary>
+        internal static string Application_Web_HomePage {
+            get {
+                return ResourceManager.GetString("Application_Web_HomePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 小猪多开器.
+        /// </summary>
+        internal static string ApplicationName {
+            get {
+                return ResourceManager.GetString("ApplicationName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 未找到龙之谷主程序路径[DragonNest.exe], 请在设置中手动添加主程序路径.
+        /// </summary>
+        internal static string DNExe_NotFound_Message {
+            get {
+                return ResourceManager.GetString("DNExe_NotFound_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 服务器未选择，请在设置中选择大区.
+        /// </summary>
+        internal static string DNServer_NotFound_Message {
+            get {
+                return ResourceManager.GetString("DNServer_NotFound_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to DragonNest.
+        /// </summary>
+        internal static string DragonNest_Exe_Name {
+            get {
+                return ResourceManager.GetString("DragonNest_Exe_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to dnlauncher.
+        /// </summary>
+        internal static string DragonNest_LauncherExe_Name {
+            get {
+                return ResourceManager.GetString("DragonNest_LauncherExe_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SOFTWARE\WOW6432Node\shandagames\DragonNest.
+        /// </summary>
+        internal static string DragonNest_Registry_Path {
+            get {
+                return ResourceManager.GetString("DragonNest_Registry_Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] handle {
+            get {
+                object obj = ResourceManager.GetObject("handle", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 正在关闭此进程....
         /// </summary>
         internal static string MainForm_button_click_KillingProcessMessage {
@@ -97,11 +170,20 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 按键设置.
+        ///   Looks up a localized string similar to 设置.
         /// </summary>
         internal static string MainForm_GetSettingsButton_SettingsButtonTitle {
             get {
                 return ResourceManager.GetString("MainForm_GetSettingsButton_SettingsButtonTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 启动游戏.
+        /// </summary>
+        internal static string MainForm_GetStartGameButton_title {
+            get {
+                return ResourceManager.GetString("MainForm_GetStartGameButton_title", resourceCulture);
             }
         }
         
@@ -124,7 +206,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 南方电信一区 柒才 flyingeek@live.com.
+        ///   Looks up a localized string similar to 南方电信一区 柒才 &lt;女神之瞳&gt;.
         /// </summary>
         internal static string MainForm_InitializeCopyRightLabel_CopyrightMessage {
             get {
@@ -133,20 +215,29 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 未发现龙之谷进程，列表将在游戏启动后自动更新，无须重启本程序。.
-        /// </summary>
-        internal static string MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage {
-            get {
-                return ResourceManager.GetString("MainForm_InitializeDefaultTextLabel_DefaultTextLabelMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 当前版本: 1.2.0.
+        ///   Looks up a localized string similar to 当前版本: 1.3.0 (2017/01/16).
         /// </summary>
         internal static string MainForm_InitializeVersionLabel_Version {
             get {
                 return ResourceManager.GetString("MainForm_InitializeVersionLabel_Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 如果需要多开，请等游戏完全启动或登陆后再点击启动游戏按钮.
+        /// </summary>
+        internal static string MainForm_start_game_button_first_click_message {
+            get {
+                return ResourceManager.GetString("MainForm_start_game_button_first_click_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 游戏启动中....
+        /// </summary>
+        internal static string MainForm_start_game_button_game_start_message {
+            get {
+                return ResourceManager.GetString("MainForm_start_game_button_game_start_message", resourceCulture);
             }
         }
         
@@ -160,11 +251,48 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 龙之谷掉线器.
+        ///   Looks up a localized string similar to 116.211.8.173;116.211.4.101 14301;14301 南方电信一区
+        ///116.211.2.168;116.211.2.170 14301;14301 南方电信二区
+        ///115.238.22.57;115.238.27.21 14301;14301 华东电信一区
+        ///115.238.22.10;115.238.27.76 14301;14301 华东电信二区
+        ///115.238.27.95;115.238.22.201 14301;14301 华东电信七区
+        ///14.152.76.110;14.152.76.94 14301;14301 华南电信一区
+        ///14.152.76.111;14.152.76.95 14301;14301 华南电信三区
+        ///116.211.2.199;116.211.4.14 14301;14301 华中电信一区
+        ///116.211.2.181;116.211.2.183 14301;14301 西南电信一区
+        ///111.161.33.30;111.161.33.31 14301;14301 华北网通一区
+        ///111.161.33.10;111.161.33.12 14301; [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string Program_ShowAdminErrorDialogBox_ApplicationName {
+        internal static string servers {
             get {
-                return ResourceManager.GetString("Program_ShowAdminErrorDialogBox_ApplicationName", resourceCulture);
+                return ResourceManager.GetString("servers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 请选择龙之谷游戏文件夹(包含游戏启动程序的根目录).
+        /// </summary>
+        internal static string SettingsForm_PathSelection_Description {
+            get {
+                return ResourceManager.GetString("SettingsForm_PathSelection_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 未在该目录下发现龙之谷启动程序，请选择含有龙之谷启动程序的游戏目录.
+        /// </summary>
+        internal static string SettingsForm_PathSelection_InvalidPath_Message {
+            get {
+                return ResourceManager.GetString("SettingsForm_PathSelection_InvalidPath_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers.
+        /// </summary>
+        internal static string WINNT_AppCompatFlags_Registry_Path {
+            get {
+                return ResourceManager.GetString("WINNT_AppCompatFlags_Registry_Path", resourceCulture);
             }
         }
     }

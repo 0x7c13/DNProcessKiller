@@ -22,6 +22,7 @@ namespace ProcessKiller
 
         public ProcessButton(Color highlightColor, Color unhighlightColor, Color disableColor, string killingMessage, string defaultText, string highlightedText)
         {
+            SetStyle(ControlStyles.Selectable, false);
             _highlightColor = highlightColor;
             _unhighlightColor = unhighlightColor;
             _disableColor = disableColor;

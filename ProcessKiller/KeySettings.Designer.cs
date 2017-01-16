@@ -25,7 +25,7 @@ namespace ProcessKiller {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("115")]
+        [global::System.Configuration.DefaultSettingValueAttribute("119")]
         public int ProcessKillerKey {
             get {
                 return ((int)(this["ProcessKillerKey"]));
@@ -44,6 +44,42 @@ namespace ProcessKiller {
             }
             set {
                 this["CountDownKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GameDicPath {
+            get {
+                return ((string)(this["GameDicPath"]));
+            }
+            set {
+                this["GameDicPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ServerName {
+            get {
+                return ((string)(this["ServerName"]));
+            }
+            set {
+                this["ServerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsFirstTimeClickOnStartButton {
+            get {
+                return ((bool)(this["IsFirstTimeClickOnStartButton"]));
+            }
+            set {
+                this["IsFirstTimeClickOnStartButton"] = value;
             }
         }
     }

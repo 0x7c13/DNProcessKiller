@@ -5,6 +5,12 @@ namespace ProcessKiller
     using System.Windows.Forms;
     using System.Security.Principal;
     using Properties;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Text.RegularExpressions;
+    using System.Threading;
+    using GoogleAnalyticsTracker.Mvc4;
+
 
     static class Program
     {
@@ -17,9 +23,12 @@ namespace ProcessKiller
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            //KeySettings.Default.Reset();
+
             // check admin privilege
             if (IsAdministrator())
             {
+                AppTracker.TrackPageView("Application", "Start");
                 Application.Run(new MainForm());
             }
             else
@@ -27,6 +36,9 @@ namespace ProcessKiller
                 ShowAdminPrivilegeMessageBox();
             }
         }
+
+
+
         public static bool IsAdministrator()
         {
             return (new WindowsPrincipal(WindowsIdentity.GetCurrent()))
@@ -36,7 +48,7 @@ namespace ProcessKiller
         public static void ShowAdminPrivilegeMessageBox()
         {
             MessageBox.Show(Resources.Program_ShowAdminErrorDialogBox_AdminPrivilegeMessage, 
-                Resources.Program_ShowAdminErrorDialogBox_ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

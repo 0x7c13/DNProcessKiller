@@ -3,10 +3,19 @@
   <Profiles />
   <Settings>
     <Setting Name="ProcessKillerKey" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">115</Value>
+      <Value Profile="(Default)">119</Value>
     </Setting>
     <Setting Name="CountDownKey" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">116</Value>
+    </Setting>
+    <Setting Name="GameDicPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="IsFirstTimeClickOnStartButton" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

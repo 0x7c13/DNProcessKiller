@@ -24,6 +24,7 @@ namespace ProcessKiller
 
         public TimerButton(TimeSpan countDown, TimeSpan alertThreshold, Color timerDefaultTextColor, Color timerAlertTextColor, Color timerRunningBackColor, Color timerDefaultBackColor)
         {
+            SetStyle(ControlStyles.Selectable, false);
             _countDown = countDown;
             _alertThreshold = alertThreshold;
             _timerDefaultTextColor = timerDefaultTextColor;
