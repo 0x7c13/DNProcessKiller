@@ -35,15 +35,17 @@
             this.ProcessKillerButtonLabel = new System.Windows.Forms.Label();
             this.ProcessKillerKeyTextbox = new System.Windows.Forms.TextBox();
             this.CountDownButtonLabel = new System.Windows.Forms.Label();
+            this.DisableProcessKillLabel = new System.Windows.Forms.Label();
+            this.DisableProcessKillCheckBox = new System.Windows.Forms.CheckBox();
             this.ApplyButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
             this.LoggingSettingsGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.GameDicLabel = new System.Windows.Forms.Label();
             this.ServerSettingLabel = new System.Windows.Forms.Label();
-            this.GameDicPathTextBox = new System.Windows.Forms.TextBox();
             this.ServerSelectionBox = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.GameDicPathTextBox = new System.Windows.Forms.TextBox();
             this.PathSelectionButton = new System.Windows.Forms.Button();
             this.KeySettingsGroupBox.SuspendLayout();
             this.SettingsTable.SuspendLayout();
@@ -58,33 +60,37 @@
             this.KeySettingsGroupBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.KeySettingsGroupBox.Location = new System.Drawing.Point(12, 12);
             this.KeySettingsGroupBox.Name = "KeySettingsGroupBox";
-            this.KeySettingsGroupBox.Size = new System.Drawing.Size(274, 141);
+            this.KeySettingsGroupBox.Size = new System.Drawing.Size(274, 169);
             this.KeySettingsGroupBox.TabIndex = 0;
             this.KeySettingsGroupBox.TabStop = false;
-            this.KeySettingsGroupBox.Text = "按键设置";
+            this.KeySettingsGroupBox.Text = "功能与按键设置";
             // 
             // SettingsTable
             // 
             this.SettingsTable.ColumnCount = 2;
             this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55.10204F));
             this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 44.89796F));
+            this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.SettingsTable.Controls.Add(this.CountDownKeyTextBox, 1, 1);
             this.SettingsTable.Controls.Add(this.ProcessKillerButtonLabel, 0, 0);
             this.SettingsTable.Controls.Add(this.ProcessKillerKeyTextbox, 1, 0);
             this.SettingsTable.Controls.Add(this.CountDownButtonLabel, 0, 1);
+            this.SettingsTable.Controls.Add(this.DisableProcessKillLabel, 0, 2);
+            this.SettingsTable.Controls.Add(this.DisableProcessKillCheckBox, 1, 2);
             this.SettingsTable.Location = new System.Drawing.Point(7, 22);
             this.SettingsTable.Name = "SettingsTable";
-            this.SettingsTable.RowCount = 2;
+            this.SettingsTable.RowCount = 3;
             this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.SettingsTable.Size = new System.Drawing.Size(260, 108);
+            this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 39F));
+            this.SettingsTable.Size = new System.Drawing.Size(260, 141);
             this.SettingsTable.TabIndex = 0;
             // 
             // CountDownKeyTextBox
             // 
             this.CountDownKeyTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.CountDownKeyTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CountDownKeyTextBox.Location = new System.Drawing.Point(146, 68);
+            this.CountDownKeyTextBox.Location = new System.Drawing.Point(146, 64);
             this.CountDownKeyTextBox.Name = "CountDownKeyTextBox";
             this.CountDownKeyTextBox.ReadOnly = true;
             this.CountDownKeyTextBox.Size = new System.Drawing.Size(88, 25);
@@ -98,7 +104,7 @@
             this.ProcessKillerButtonLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ProcessKillerButtonLabel.Location = new System.Drawing.Point(3, 0);
             this.ProcessKillerButtonLabel.Name = "ProcessKillerButtonLabel";
-            this.ProcessKillerButtonLabel.Size = new System.Drawing.Size(137, 54);
+            this.ProcessKillerButtonLabel.Size = new System.Drawing.Size(137, 51);
             this.ProcessKillerButtonLabel.TabIndex = 0;
             this.ProcessKillerButtonLabel.Text = "掉线快捷键:";
             this.ProcessKillerButtonLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -107,7 +113,7 @@
             // 
             this.ProcessKillerKeyTextbox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.ProcessKillerKeyTextbox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ProcessKillerKeyTextbox.Location = new System.Drawing.Point(146, 14);
+            this.ProcessKillerKeyTextbox.Location = new System.Drawing.Point(146, 13);
             this.ProcessKillerKeyTextbox.Name = "ProcessKillerKeyTextbox";
             this.ProcessKillerKeyTextbox.ReadOnly = true;
             this.ProcessKillerKeyTextbox.Size = new System.Drawing.Size(88, 25);
@@ -119,16 +125,41 @@
             this.CountDownButtonLabel.AutoSize = true;
             this.CountDownButtonLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CountDownButtonLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.CountDownButtonLabel.Location = new System.Drawing.Point(3, 54);
+            this.CountDownButtonLabel.Location = new System.Drawing.Point(3, 51);
             this.CountDownButtonLabel.Name = "CountDownButtonLabel";
-            this.CountDownButtonLabel.Size = new System.Drawing.Size(137, 54);
+            this.CountDownButtonLabel.Size = new System.Drawing.Size(137, 51);
             this.CountDownButtonLabel.TabIndex = 2;
             this.CountDownButtonLabel.Text = "倒计时快捷键:";
             this.CountDownButtonLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // DisableProcessKillLabel
+            // 
+            this.DisableProcessKillLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.DisableProcessKillLabel.AutoSize = true;
+            this.DisableProcessKillLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.DisableProcessKillLabel.Location = new System.Drawing.Point(3, 102);
+            this.DisableProcessKillLabel.Name = "DisableProcessKillLabel";
+            this.DisableProcessKillLabel.Size = new System.Drawing.Size(137, 39);
+            this.DisableProcessKillLabel.TabIndex = 4;
+            this.DisableProcessKillLabel.Text = "禁用秒掉功能:";
+            this.DisableProcessKillLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // DisableProcessKillCheckBox
+            // 
+            this.DisableProcessKillCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.DisableProcessKillCheckBox.AutoSize = true;
+            this.DisableProcessKillCheckBox.Location = new System.Drawing.Point(146, 113);
+            this.DisableProcessKillCheckBox.Name = "DisableProcessKillCheckBox";
+            this.DisableProcessKillCheckBox.Size = new System.Drawing.Size(18, 17);
+            this.DisableProcessKillCheckBox.TabIndex = 5;
+            this.DisableProcessKillCheckBox.UseVisualStyleBackColor = true;
+            this.DisableProcessKillCheckBox.CheckedChanged += new System.EventHandler(this.DisableProcessKillCheckBox_CheckedChanged);
+            // 
             // ApplyButton
             // 
-            this.ApplyButton.Location = new System.Drawing.Point(26, 296);
+            this.ApplyButton.Location = new System.Drawing.Point(26, 337);
             this.ApplyButton.Name = "ApplyButton";
             this.ApplyButton.Size = new System.Drawing.Size(100, 35);
             this.ApplyButton.TabIndex = 1;
@@ -138,7 +169,7 @@
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(176, 296);
+            this.CancelButton.Location = new System.Drawing.Point(176, 337);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(100, 35);
             this.CancelButton.TabIndex = 2;
@@ -150,7 +181,7 @@
             // 
             this.LoggingSettingsGroupBox.Controls.Add(this.tableLayoutPanel1);
             this.LoggingSettingsGroupBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LoggingSettingsGroupBox.Location = new System.Drawing.Point(12, 164);
+            this.LoggingSettingsGroupBox.Location = new System.Drawing.Point(13, 199);
             this.LoggingSettingsGroupBox.Name = "LoggingSettingsGroupBox";
             this.LoggingSettingsGroupBox.Size = new System.Drawing.Size(274, 120);
             this.LoggingSettingsGroupBox.TabIndex = 3;
@@ -202,16 +233,6 @@
             this.ServerSettingLabel.Text = "大区选择:";
             this.ServerSettingLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // GameDicPathTextBox
-            // 
-            this.GameDicPathTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.GameDicPathTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.GameDicPathTextBox.Location = new System.Drawing.Point(3, 6);
-            this.GameDicPathTextBox.Name = "GameDicPathTextBox";
-            this.GameDicPathTextBox.ReadOnly = true;
-            this.GameDicPathTextBox.Size = new System.Drawing.Size(117, 25);
-            this.GameDicPathTextBox.TabIndex = 3;
-            // 
             // ServerSelectionBox
             // 
             this.ServerSelectionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -237,6 +258,16 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(162, 38);
             this.tableLayoutPanel2.TabIndex = 5;
             // 
+            // GameDicPathTextBox
+            // 
+            this.GameDicPathTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.GameDicPathTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.GameDicPathTextBox.Location = new System.Drawing.Point(3, 6);
+            this.GameDicPathTextBox.Name = "GameDicPathTextBox";
+            this.GameDicPathTextBox.ReadOnly = true;
+            this.GameDicPathTextBox.Size = new System.Drawing.Size(117, 25);
+            this.GameDicPathTextBox.TabIndex = 3;
+            // 
             // PathSelectionButton
             // 
             this.PathSelectionButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -253,7 +284,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(299, 343);
+            this.ClientSize = new System.Drawing.Size(299, 384);
             this.Controls.Add(this.LoggingSettingsGroupBox);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.ApplyButton);
@@ -294,5 +325,7 @@
         private System.Windows.Forms.ComboBox ServerSelectionBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Button PathSelectionButton;
+        private System.Windows.Forms.Label DisableProcessKillLabel;
+        private System.Windows.Forms.CheckBox DisableProcessKillCheckBox;
     }
 }

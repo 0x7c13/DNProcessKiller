@@ -20,6 +20,7 @@ namespace ProcessKiller
         private bool _listeningKeyboardEvent;
         private string _oldProcessKillerKey;
         private string _oldCountDownKey;
+        private bool _disableProcessKiller;
 
         private Keys _userDefinedProcessKillerKey, _userDefinedCountDownKey;
 
@@ -64,6 +65,7 @@ namespace ProcessKiller
 
             Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _userDefinedProcessKillerKey);
             Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _userDefinedCountDownKey);
+            _disableProcessKiller = KeySettings.Default.DisableProcessKiller;
             var gameDicPath = KeySettings.Default.GameDicPath;
             var serverName = KeySettings.Default.ServerName;
 
@@ -73,6 +75,12 @@ namespace ProcessKiller
             if (!string.IsNullOrEmpty(gameDicPath))
             {
                 this.GameDicPathTextBox.Text = gameDicPath;
+            }
+
+            if (_disableProcessKiller)
+            {
+                this.DisableProcessKillCheckBox.Checked = _disableProcessKiller;
+                this.ProcessKillerKeyTextbox.Enabled = !_disableProcessKiller;
             }
 
             var serverList = DNServerInfo.GetServerListFromResource();
@@ -171,7 +179,17 @@ namespace ProcessKiller
                 MessageBox.Show(Resources.SettingsForm_PathSelection_InvalidPath_Message, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-            
+
+        private void DisableProcessKillCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            _disableProcessKiller = this.DisableProcessKillCheckBox.Checked;
+            this.ProcessKillerKeyTextbox.Enabled = !_disableProcessKiller;
+            if (!_disableProcessKiller)
+            {
+                MessageBox.Show(Resources.SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         private void SaveUserSettings()
         {
             if (!string.IsNullOrEmpty(this.ProcessKillerKeyTextbox.Text))
@@ -197,6 +215,8 @@ namespace ProcessKiller
                 }
                 KeySettings.Default.ServerName = this.ServerSelectionBox.SelectedItem.ToString();
             }
+
+            KeySettings.Default.DisableProcessKiller = this.DisableProcessKillCheckBox.Checked;
 
             KeySettings.Default.Save(); // Saves settings in application configuration file
         }

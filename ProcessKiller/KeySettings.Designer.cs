@@ -82,5 +82,17 @@ namespace ProcessKiller {
                 this["IsFirstTimeClickOnStartButton"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DisableProcessKiller {
+            get {
+                return ((bool)(this["DisableProcessKiller"]));
+            }
+            set {
+                this["DisableProcessKiller"] = value;
+            }
+        }
     }
 }

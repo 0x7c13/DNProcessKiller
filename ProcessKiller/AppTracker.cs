@@ -7,6 +7,7 @@ namespace ProcessKiller
     {
         private const string AccountName = "UA-90446002-1";
         private const string TrackingDomain = "小猪多开器 V1.3.0";
+        
 
         public static async void TrackPageView(string pageTitle, string pageUrl)
         {

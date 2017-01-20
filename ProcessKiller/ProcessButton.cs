@@ -7,6 +7,7 @@ namespace ProcessKiller
     using System.Diagnostics;
     using System.Threading.Tasks;
     using System.Drawing;
+    using System.Management;
 
     class ProcessButton : Button
     {
@@ -122,7 +123,7 @@ namespace ProcessKiller
             this.BackColor = _disableColor;
             this.HidePerformanceCounter();
             this.Text = _killingMessage;
-            this.Process.Kill();
+            KillProcessAndChildren(this.Process.Id);
         }
 
         public void Highlight()
@@ -168,6 +169,24 @@ namespace ProcessKiller
             }
             throw new Exception("Could not find performance counter " +
                 "instance name for current process. This is truly strange ...");
+        }
+
+        private void KillProcessAndChildren(int pid)
+        {
+            var searcher = new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" + pid);
+            var moc = searcher.Get();
+            foreach (var mo in moc)
+            {
+                KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+            }
+            try
+            {
+                this.Process.Kill();
+            }
+            catch (ArgumentException)
+            {
+                // Process already exited.
+            }
         }
 
         protected override bool ShowFocusCues => false;

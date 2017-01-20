@@ -70,7 +70,16 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to http://bbs.duowan.com/forum.php?mod=viewthread&amp;tid=45386278&amp;fromuid=38312866.
+        ///   Looks up a localized string similar to (01/21/2017).
+        /// </summary>
+        internal static string Application_PublishDate {
+            get {
+                return ResourceManager.GetString("Application_PublishDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to http://bbs.duowan.com/thread-45386278-1-1.html.
         /// </summary>
         internal static string Application_Web_HomePage {
             get {
@@ -152,6 +161,24 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 发现新版本:.
+        /// </summary>
+        internal static string MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message {
+            get {
+                return ResourceManager.GetString("MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 点击前往下载页.
+        /// </summary>
+        internal static string MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message_End {
+            get {
+                return ResourceManager.GetString("MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message_End", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 当前窗口.
         /// </summary>
         internal static string MainForm_GetProcessButton_ProcessButtonHighlightedTitle {
@@ -215,7 +242,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 当前版本: 1.3.1 (2017/01/16).
+        ///   Looks up a localized string similar to 当前版本:.
         /// </summary>
         internal static string MainForm_InitializeVersionLabel_Version {
             get {
@@ -266,6 +293,15 @@ namespace ProcessKiller.Properties {
         internal static string servers {
             get {
                 return ResourceManager.GetString("servers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 使用秒掉功能会增加封号风险，请慎重使用，如果被反外挂发现，请立即停止使用.
+        /// </summary>
+        internal static string SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning {
+            get {
+                return ResourceManager.GetString("SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning", resourceCulture);
             }
         }
         

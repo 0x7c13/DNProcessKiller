@@ -9,7 +9,7 @@ namespace ProcessKiller
     using System.Diagnostics;
     using System.IO;
     using System.Text.RegularExpressions;
-
+    using Microsoft.Win32;
 
     public class MutexAppLauncher
     {
@@ -22,8 +22,19 @@ namespace ProcessKiller
             {
                 throw new ArgumentException("hanlde.exe not found");
             }
+
+            _handleExeRegistry();
             _handleExePath = handleExePath;
             _appName = appName;
+        }
+
+        private void _handleExeRegistry()
+        {
+            var reg = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\Sysinternals\\Handle", "EulaAccepted", null);
+            if ((reg == null || reg.ToString() == "0"))
+            {
+                Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\Sysinternals\\Handle", "EulaAccepted", 1);
+            }
         }
 
         public void Launch(string workingDir, string fileName, string args)

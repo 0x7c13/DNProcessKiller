@@ -79,6 +79,7 @@ namespace ProcessKiller
             this.MinButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
             this.MinButton.FlatAppearance.BorderSize = 0;
             this.MinButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MinButton.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.MinButton.ForeColor = System.Drawing.Color.White;
             this.MinButton.Location = new System.Drawing.Point(348, 0);
             this.MinButton.Margin = new System.Windows.Forms.Padding(0);
@@ -95,6 +96,7 @@ namespace ProcessKiller
             this.ExitButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
             this.ExitButton.FlatAppearance.BorderSize = 0;
             this.ExitButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ExitButton.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ExitButton.ForeColor = System.Drawing.Color.White;
             this.ExitButton.Location = new System.Drawing.Point(385, 0);
             this.ExitButton.Margin = new System.Windows.Forms.Padding(0);
