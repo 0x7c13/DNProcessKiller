@@ -5,11 +5,7 @@ namespace ProcessKiller
     using System.Windows.Forms;
     using System.Security.Principal;
     using Properties;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using GoogleAnalyticsTracker.Mvc4;
+    using System.Reflection; 
 
 
     static class Program
@@ -28,7 +24,8 @@ namespace ProcessKiller
             // check admin privilege
             if (IsAdministrator())
             {
-                AppTracker.TrackEvent("Application", "Start");
+                var currentVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
+                AppTracker.TrackEvent("Application", $"Start_Version_{currentVersion}");
                 Application.Run(new MainForm());
             }
             else

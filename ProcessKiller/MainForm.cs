@@ -15,13 +15,14 @@ namespace ProcessKiller
     using System.Threading.Tasks;
     using Microsoft.Win32;
     using System.Threading;
+    using System.Reflection;
 
     public partial class MainForm : Form
     {
         private readonly ProcessMonitor _processMonitor;
         private Button _startGameButton;
         private Label _copyrightLabel;
-        private LinkLabel _versionInfoLabel;
+        private LinkLabel _versionInfoLabel, _newVersionDownloadLinkLabel;
         private TimerButton _timerButton;
         private readonly FlowLayoutPanel _container;
         private FlowLayoutPanel _buttonsContainer;
@@ -32,10 +33,11 @@ namespace ProcessKiller
         private const int DefaultTimerButtonHeight = 80;
         private const int DefaultProcessKillerButtonHeight = 40;
         private const int DefaultCopyrightLabelHeight = 20;
-        private const int DefaultVersionInfoLabelHeight = 30;
+        private const int DefaultVersionInfoLabelHeight = 25;
         private const int DefaultClientRectangleWidth = 250;
         private const int DefaultSettingsButtonHeight = 30;
         private const int DefaultStartGameButtonHeight = 50;
+        private const int DefaultNewVersionDownloadLinkLabelHeight = 20;
 
         private const int DefaultCountDownInSeconds = 90;
         private const int DefaultCountDownAlertInSeconds = 15;
@@ -59,6 +61,7 @@ namespace ProcessKiller
 
         private Keys _processKillerKey, _countDownKey;
         private string _gameDicPath;
+        private bool _disableProcessKiller;
 
         private static readonly object _locker = new object();
         private bool _listeningToKeyboardEvents = true;
@@ -137,6 +140,41 @@ namespace ProcessKiller
             // hacky way to keep delegates alive
             GC.KeepAlive(_winEvent);
             GC.KeepAlive(_keyboardEventHook);
+
+            // new version check
+            Task.Run(() =>
+            {
+                NotifyIfNewVersionFound();
+            });
+        }
+
+        private void NotifyIfNewVersionFound()
+        {
+            if (IsDisposed || !this.IsHandleCreated) return;
+
+            try
+            {
+                var latestVersion = new DuowanAppVersionResolver(Resources.Application_Web_HomePage).GetLatestVersion();
+                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+
+                if (currentVersion.CompareTo(latestVersion) < 0)
+                {
+                    if (IsDisposed || !this.IsHandleCreated) return;
+
+                    this.BeginInvoke(new MethodInvoker(() =>
+                    {
+                        _newVersionDownloadLinkLabel.Text = Resources.MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message +
+                        " " + latestVersion.ToString() + " " + Resources.MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message_End;
+                        _container.Controls.Add(_newVersionDownloadLinkLabel);
+                        ResizeWindowIfNeeded();
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return;
+            }
         }
 
         private void InitializeTitleBar()
@@ -157,6 +195,7 @@ namespace ProcessKiller
         {
             Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
             Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
+            _disableProcessKiller = KeySettings.Default.DisableProcessKiller;
             _gameDicPath = _getGameDir();
         }
 
@@ -193,15 +232,33 @@ namespace ProcessKiller
 
         private LinkLabel GetVersionInfoLabel(int width)
         {
+            var currentVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(3);
             return new LinkLabel()
             {
                 Width = width,
                 Height = DefaultVersionInfoLabelHeight,
-                Text = Resources.MainForm_InitializeVersionLabel_Version,
+                Text = Resources.MainForm_InitializeVersionLabel_Version + " " + currentVersion + " " + Resources.Application_PublishDate,
                 Font = new Font(_defaultFontFamily, 8, FontStyle.Regular),
                 TextAlign = ContentAlignment.MiddleCenter,
                 ForeColor = Color.White,
                 LinkColor = Color.White,
+                ActiveLinkColor = Color.Gray,
+                LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline,
+            };
+        }
+
+        private LinkLabel GetNewVersionDownloadLinkLabel(int width)
+        {
+            return new LinkLabel()
+            {
+                Width = width,
+                Height = DefaultNewVersionDownloadLinkLabelHeight,
+                Text = Resources.MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message,
+                Font = new Font(_defaultFontFamily, 8, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.White,
+                LinkColor = Color.White,
+                BackColor = Color.DarkGreen,
                 ActiveLinkColor = Color.Gray,
                 LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline,
             };
@@ -219,7 +276,7 @@ namespace ProcessKiller
                 Font = new Font(_defaultFontFamily, 12, FontStyle.Regular),
                 Text = Resources.MainForm_GetProcessButton_ProcessButtonTitle + " (PID:" + process.Id + ")",
                 Process = process,
-                Margin = new Padding(3, 5, 3, 1),
+                Margin = _disableProcessKiller ? new Padding(3, 3, 3, 3) : new Padding(3, 5, 3, 1),
                 FlatStyle = FlatStyle.Flat,
             };
             button.FlatAppearance.BorderSize = 0;
@@ -307,8 +364,12 @@ namespace ProcessKiller
             {
                 var process = _processMonitor.GetRunningProcesses()[i];
                 var button = GetProcessButton(process);
-                var killerButton = GetProcessKillerButton(button);
                 _buttonsContainer.Controls.Add(button);
+                var killerButton = GetProcessKillerButton(button);
+                if (_disableProcessKiller)
+                {
+                    killerButton.Hide();
+                }
                 _buttonsContainer.Controls.Add(killerButton);
                 button.ShowPerformanceCounter();
             }
@@ -324,14 +385,23 @@ namespace ProcessKiller
             _copyrightLabel.MouseDown += window_mouse_down;
             container.Controls.Add(_copyrightLabel);
             _versionInfoLabel = GetVersionInfoLabel(width);
-            _versionInfoLabel.LinkClicked += link_clicked;
+            _versionInfoLabel.LinkClicked += home_link_clicked;
             container.Controls.Add(_versionInfoLabel);
+            _newVersionDownloadLinkLabel = GetNewVersionDownloadLinkLabel(width);
+            _newVersionDownloadLinkLabel.LinkClicked += new_version_link_clicked;
 
             ResizeWindowIfNeeded();
         }
 
-        private void link_clicked(object sender, EventArgs e)
+        private void home_link_clicked(object sender, EventArgs e)
         {
+            AppTracker.TrackEvent("MainForm", "AppHomePageLinkClicked");
+            Process.Start(Resources.Application_Web_HomePage);
+        }
+
+        private void new_version_link_clicked(object sender, EventArgs e)
+        {
+            AppTracker.TrackEvent("MainForm", "NewVersionLinkClicked");
             Process.Start(Resources.Application_Web_HomePage);
         }
 
@@ -410,6 +480,10 @@ namespace ProcessKiller
                         var button = GetProcessButton(process);
                         var killerButton = GetProcessKillerButton(button);
                         _buttonsContainer.Controls.Add(button);
+                        if (_disableProcessKiller)
+                        {
+                            killerButton.Hide();
+                        }
                         _buttonsContainer.Controls.Add(killerButton);
                         button.ShowPerformanceCounter();
                         SetProcessButtonActiveByProcessId(pid);
@@ -646,6 +720,8 @@ namespace ProcessKiller
 
             if (e.KeyCode == _processKillerKey)
             {
+                if (_disableProcessKiller) return;
+                
                 this.BeginInvoke(new MethodInvoker(() =>
                 {
                     if (_buttonsContainer.Controls.Count == 0) return;
@@ -696,7 +772,32 @@ namespace ProcessKiller
         private void settings_form_closed(object sender, EventArgs e)
         {
             InitializeSettings();
+            var processKillerButtons = _buttonsContainer.Controls.OfType<ProcessKillerButton>().ToList();
+            foreach (var processKillerButton in processKillerButtons)
+            {
+                if (_disableProcessKiller)
+                {
+                    processKillerButton.Hide();
+                }
+                else
+                {
+                    processKillerButton.Show();
+                }
+            }
+
+            ResetProcessButtonMargin();
+
+            ResizeWindowIfNeeded();
             _listeningToKeyboardEvents = true;
+        }
+
+        private void ResetProcessButtonMargin()
+        {
+            var processButtons = _buttonsContainer.Controls.OfType<ProcessButton>().ToList();
+            foreach (var processButton in processButtons)
+            {
+                processButton.Margin = _disableProcessKiller ? new Padding(3, 3, 3, 3) : new Padding(3, 5, 3, 1);
+            }
         }
 
         private void resize_end(object sender, EventArgs e)
