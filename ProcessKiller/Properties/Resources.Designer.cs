@@ -70,7 +70,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (01/21/2017).
+        ///   Looks up a localized string similar to (01/24/2017).
         /// </summary>
         internal static string Application_PublishDate {
             get {
@@ -215,6 +215,15 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 有问题或者有疑问的加群来问吧，群号: 610614351.
+        /// </summary>
+        internal static string MainForm_HelpButton_Message {
+            get {
+                return ResourceManager.GetString("MainForm_HelpButton_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 点我或按键掉线.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage {
@@ -302,6 +311,24 @@ namespace ProcessKiller.Properties {
         internal static string SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning {
             get {
                 return ResourceManager.GetString("SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 时间设置必须大于0.
+        /// </summary>
+        internal static string SettingsForm_InvalidField_CountDownTime {
+            get {
+                return ResourceManager.GetString("SettingsForm_InvalidField_CountDownTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 想啥呢？提示时间必须小于倒计时时间 (mdzz).
+        /// </summary>
+        internal static string SettingsForm_InvalidField_CountDownWarnningTime {
+            get {
+                return ResourceManager.GetString("SettingsForm_InvalidField_CountDownWarnningTime", resourceCulture);
             }
         }
         

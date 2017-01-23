@@ -12,7 +12,6 @@ namespace ProcessKiller
     class TimerButton : Button
     {
         private readonly Stopwatch _watch;
-        private readonly TimeSpan _countDown, _alertThreshold;
         private DateTime _startTime;
         private bool _started;
         private bool _alertCreated;
@@ -21,12 +20,13 @@ namespace ProcessKiller
         private readonly Color _timerRunningBackColor;
         private readonly Color _timerDefaultBackColor;
 
+        public  TimeSpan CountDownTime, AlertThreshold;
 
         public TimerButton(TimeSpan countDown, TimeSpan alertThreshold, Color timerDefaultTextColor, Color timerAlertTextColor, Color timerRunningBackColor, Color timerDefaultBackColor)
         {
             SetStyle(ControlStyles.Selectable, false);
-            _countDown = countDown;
-            _alertThreshold = alertThreshold;
+            CountDownTime = countDown;
+            AlertThreshold = alertThreshold;
             _timerDefaultTextColor = timerDefaultTextColor;
             _timerAlertTextColor = timerAlertTextColor;
             _timerRunningBackColor = timerRunningBackColor;
@@ -45,9 +45,9 @@ namespace ProcessKiller
             {
                 while (_watch.IsRunning)
                 {
-                    var remaining = _countDown - (DateTime.Now - _startTime);
+                    var remaining = CountDownTime - (DateTime.Now - _startTime);
 
-                    if (!_alertCreated && remaining.TotalSeconds < _alertThreshold.TotalSeconds)
+                    if (!_alertCreated && remaining.TotalSeconds < AlertThreshold.TotalSeconds)
                     {
                         _alertCreated = true;
                         var player = new System.Media.SoundPlayer(Resources.alert);
@@ -85,7 +85,7 @@ namespace ProcessKiller
             _started = false;
             _alertCreated = false;
             _watch.Stop();
-            this.Text = _countDown.TotalSeconds.ToString("0");
+            this.Text = ((int)CountDownTime.TotalSeconds).ToString();
             this.ForeColor = _timerDefaultTextColor;
             this.BackColor = _timerDefaultBackColor;
         }
@@ -105,6 +105,16 @@ namespace ProcessKiller
             Pen pen = new Pen(Color.Gray, 1);
             Rectangle rectangle = new Rectangle(0, 0, Size.Width - 1, Size.Height - 1);
             e.Graphics.DrawRectangle(pen, rectangle);
+        }
+
+        public void Reset()
+        {
+            _started = false;
+            _alertCreated = false;
+            _watch.Stop();
+            this.Text = ((int) CountDownTime.TotalSeconds).ToString();
+            this.ForeColor = _timerDefaultTextColor;
+            this.BackColor = _timerDefaultBackColor;
         }
     }
 }

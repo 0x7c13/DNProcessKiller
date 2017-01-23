@@ -34,8 +34,6 @@ namespace ProcessKiller
             }
         }
 
-
-
         public static bool IsAdministrator()
         {
             return (new WindowsPrincipal(WindowsIdentity.GetCurrent()))

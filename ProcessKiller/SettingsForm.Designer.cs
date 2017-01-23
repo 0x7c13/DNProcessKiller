@@ -31,12 +31,16 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
             this.KeySettingsGroupBox = new System.Windows.Forms.GroupBox();
             this.SettingsTable = new System.Windows.Forms.TableLayoutPanel();
-            this.CountDownKeyTextBox = new System.Windows.Forms.TextBox();
             this.ProcessKillerButtonLabel = new System.Windows.Forms.Label();
             this.ProcessKillerKeyTextbox = new System.Windows.Forms.TextBox();
             this.CountDownButtonLabel = new System.Windows.Forms.Label();
             this.DisableProcessKillLabel = new System.Windows.Forms.Label();
             this.DisableProcessKillCheckBox = new System.Windows.Forms.CheckBox();
+            this.TimerCountDownTimeSettingsLabel = new System.Windows.Forms.Label();
+            this.TimerCountDownTimeTextBox = new System.Windows.Forms.TextBox();
+            this.CountDownKeyTextBox = new System.Windows.Forms.TextBox();
+            this.TimerCountDownWarnningTimeSettingsLabel = new System.Windows.Forms.Label();
+            this.TimerCountDownWarnningTimeTextBox = new System.Windows.Forms.TextBox();
             this.ApplyButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
             this.LoggingSettingsGroupBox = new System.Windows.Forms.GroupBox();
@@ -60,7 +64,7 @@
             this.KeySettingsGroupBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.KeySettingsGroupBox.Location = new System.Drawing.Point(12, 12);
             this.KeySettingsGroupBox.Name = "KeySettingsGroupBox";
-            this.KeySettingsGroupBox.Size = new System.Drawing.Size(274, 169);
+            this.KeySettingsGroupBox.Size = new System.Drawing.Size(274, 230);
             this.KeySettingsGroupBox.TabIndex = 0;
             this.KeySettingsGroupBox.TabStop = false;
             this.KeySettingsGroupBox.Text = "功能与按键设置";
@@ -68,34 +72,29 @@
             // SettingsTable
             // 
             this.SettingsTable.ColumnCount = 2;
-            this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 55.10204F));
-            this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 44.89796F));
+            this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 56.92308F));
+            this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 43.07692F));
             this.SettingsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.SettingsTable.Controls.Add(this.CountDownKeyTextBox, 1, 1);
             this.SettingsTable.Controls.Add(this.ProcessKillerButtonLabel, 0, 0);
             this.SettingsTable.Controls.Add(this.ProcessKillerKeyTextbox, 1, 0);
             this.SettingsTable.Controls.Add(this.CountDownButtonLabel, 0, 1);
             this.SettingsTable.Controls.Add(this.DisableProcessKillLabel, 0, 2);
             this.SettingsTable.Controls.Add(this.DisableProcessKillCheckBox, 1, 2);
+            this.SettingsTable.Controls.Add(this.TimerCountDownTimeSettingsLabel, 0, 3);
+            this.SettingsTable.Controls.Add(this.TimerCountDownTimeTextBox, 1, 3);
+            this.SettingsTable.Controls.Add(this.CountDownKeyTextBox, 1, 1);
+            this.SettingsTable.Controls.Add(this.TimerCountDownWarnningTimeSettingsLabel, 0, 4);
+            this.SettingsTable.Controls.Add(this.TimerCountDownWarnningTimeTextBox, 1, 4);
             this.SettingsTable.Location = new System.Drawing.Point(7, 22);
             this.SettingsTable.Name = "SettingsTable";
-            this.SettingsTable.RowCount = 3;
+            this.SettingsTable.RowCount = 5;
             this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 39F));
-            this.SettingsTable.Size = new System.Drawing.Size(260, 141);
+            this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
+            this.SettingsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.SettingsTable.Size = new System.Drawing.Size(260, 202);
             this.SettingsTable.TabIndex = 0;
-            // 
-            // CountDownKeyTextBox
-            // 
-            this.CountDownKeyTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.CountDownKeyTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CountDownKeyTextBox.Location = new System.Drawing.Point(146, 64);
-            this.CountDownKeyTextBox.Name = "CountDownKeyTextBox";
-            this.CountDownKeyTextBox.ReadOnly = true;
-            this.CountDownKeyTextBox.Size = new System.Drawing.Size(88, 25);
-            this.CountDownKeyTextBox.TabIndex = 3;
-            this.CountDownKeyTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // ProcessKillerButtonLabel
             // 
@@ -104,7 +103,7 @@
             this.ProcessKillerButtonLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ProcessKillerButtonLabel.Location = new System.Drawing.Point(3, 0);
             this.ProcessKillerButtonLabel.Name = "ProcessKillerButtonLabel";
-            this.ProcessKillerButtonLabel.Size = new System.Drawing.Size(137, 51);
+            this.ProcessKillerButtonLabel.Size = new System.Drawing.Size(142, 40);
             this.ProcessKillerButtonLabel.TabIndex = 0;
             this.ProcessKillerButtonLabel.Text = "掉线快捷键:";
             this.ProcessKillerButtonLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -113,7 +112,7 @@
             // 
             this.ProcessKillerKeyTextbox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.ProcessKillerKeyTextbox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ProcessKillerKeyTextbox.Location = new System.Drawing.Point(146, 13);
+            this.ProcessKillerKeyTextbox.Location = new System.Drawing.Point(151, 7);
             this.ProcessKillerKeyTextbox.Name = "ProcessKillerKeyTextbox";
             this.ProcessKillerKeyTextbox.ReadOnly = true;
             this.ProcessKillerKeyTextbox.Size = new System.Drawing.Size(88, 25);
@@ -125,9 +124,9 @@
             this.CountDownButtonLabel.AutoSize = true;
             this.CountDownButtonLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CountDownButtonLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.CountDownButtonLabel.Location = new System.Drawing.Point(3, 51);
+            this.CountDownButtonLabel.Location = new System.Drawing.Point(3, 40);
             this.CountDownButtonLabel.Name = "CountDownButtonLabel";
-            this.CountDownButtonLabel.Size = new System.Drawing.Size(137, 51);
+            this.CountDownButtonLabel.Size = new System.Drawing.Size(142, 40);
             this.CountDownButtonLabel.TabIndex = 2;
             this.CountDownButtonLabel.Text = "倒计时快捷键:";
             this.CountDownButtonLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -139,9 +138,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.DisableProcessKillLabel.AutoSize = true;
             this.DisableProcessKillLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.DisableProcessKillLabel.Location = new System.Drawing.Point(3, 102);
+            this.DisableProcessKillLabel.Location = new System.Drawing.Point(3, 80);
             this.DisableProcessKillLabel.Name = "DisableProcessKillLabel";
-            this.DisableProcessKillLabel.Size = new System.Drawing.Size(137, 39);
+            this.DisableProcessKillLabel.Size = new System.Drawing.Size(142, 40);
             this.DisableProcessKillLabel.TabIndex = 4;
             this.DisableProcessKillLabel.Text = "禁用秒掉功能:";
             this.DisableProcessKillLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -150,16 +149,76 @@
             // 
             this.DisableProcessKillCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.DisableProcessKillCheckBox.AutoSize = true;
-            this.DisableProcessKillCheckBox.Location = new System.Drawing.Point(146, 113);
+            this.DisableProcessKillCheckBox.Location = new System.Drawing.Point(151, 91);
             this.DisableProcessKillCheckBox.Name = "DisableProcessKillCheckBox";
             this.DisableProcessKillCheckBox.Size = new System.Drawing.Size(18, 17);
             this.DisableProcessKillCheckBox.TabIndex = 5;
             this.DisableProcessKillCheckBox.UseVisualStyleBackColor = true;
             this.DisableProcessKillCheckBox.CheckedChanged += new System.EventHandler(this.DisableProcessKillCheckBox_CheckedChanged);
             // 
+            // TimerCountDownTimeSettingsLabel
+            // 
+            this.TimerCountDownTimeSettingsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TimerCountDownTimeSettingsLabel.AutoSize = true;
+            this.TimerCountDownTimeSettingsLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TimerCountDownTimeSettingsLabel.Location = new System.Drawing.Point(3, 120);
+            this.TimerCountDownTimeSettingsLabel.Name = "TimerCountDownTimeSettingsLabel";
+            this.TimerCountDownTimeSettingsLabel.Size = new System.Drawing.Size(142, 41);
+            this.TimerCountDownTimeSettingsLabel.TabIndex = 6;
+            this.TimerCountDownTimeSettingsLabel.Text = "计时器时间设置:";
+            this.TimerCountDownTimeSettingsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TimerCountDownTimeTextBox
+            // 
+            this.TimerCountDownTimeTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.TimerCountDownTimeTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TimerCountDownTimeTextBox.Location = new System.Drawing.Point(151, 127);
+            this.TimerCountDownTimeTextBox.Name = "TimerCountDownTimeTextBox";
+            this.TimerCountDownTimeTextBox.ShortcutsEnabled = false;
+            this.TimerCountDownTimeTextBox.Size = new System.Drawing.Size(88, 27);
+            this.TimerCountDownTimeTextBox.TabIndex = 7;
+            this.TimerCountDownTimeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // CountDownKeyTextBox
+            // 
+            this.CountDownKeyTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.CountDownKeyTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CountDownKeyTextBox.Location = new System.Drawing.Point(151, 47);
+            this.CountDownKeyTextBox.Name = "CountDownKeyTextBox";
+            this.CountDownKeyTextBox.ReadOnly = true;
+            this.CountDownKeyTextBox.Size = new System.Drawing.Size(88, 25);
+            this.CountDownKeyTextBox.TabIndex = 3;
+            this.CountDownKeyTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // TimerCountDownWarnningTimeSettingsLabel
+            // 
+            this.TimerCountDownWarnningTimeSettingsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TimerCountDownWarnningTimeSettingsLabel.AutoSize = true;
+            this.TimerCountDownWarnningTimeSettingsLabel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TimerCountDownWarnningTimeSettingsLabel.Location = new System.Drawing.Point(3, 161);
+            this.TimerCountDownWarnningTimeSettingsLabel.Name = "TimerCountDownWarnningTimeSettingsLabel";
+            this.TimerCountDownWarnningTimeSettingsLabel.Size = new System.Drawing.Size(142, 41);
+            this.TimerCountDownWarnningTimeSettingsLabel.TabIndex = 8;
+            this.TimerCountDownWarnningTimeSettingsLabel.Text = "倒计时提示时间:";
+            this.TimerCountDownWarnningTimeSettingsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // TimerCountDownWarnningTimeTextBox
+            // 
+            this.TimerCountDownWarnningTimeTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.TimerCountDownWarnningTimeTextBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.TimerCountDownWarnningTimeTextBox.Location = new System.Drawing.Point(151, 168);
+            this.TimerCountDownWarnningTimeTextBox.Name = "TimerCountDownWarnningTimeTextBox";
+            this.TimerCountDownWarnningTimeTextBox.Size = new System.Drawing.Size(88, 27);
+            this.TimerCountDownWarnningTimeTextBox.TabIndex = 9;
+            this.TimerCountDownWarnningTimeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // ApplyButton
             // 
-            this.ApplyButton.Location = new System.Drawing.Point(26, 337);
+            this.ApplyButton.Location = new System.Drawing.Point(26, 382);
             this.ApplyButton.Name = "ApplyButton";
             this.ApplyButton.Size = new System.Drawing.Size(100, 35);
             this.ApplyButton.TabIndex = 1;
@@ -169,7 +228,7 @@
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(176, 337);
+            this.CancelButton.Location = new System.Drawing.Point(174, 382);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(100, 35);
             this.CancelButton.TabIndex = 2;
@@ -181,7 +240,7 @@
             // 
             this.LoggingSettingsGroupBox.Controls.Add(this.tableLayoutPanel1);
             this.LoggingSettingsGroupBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.LoggingSettingsGroupBox.Location = new System.Drawing.Point(13, 199);
+            this.LoggingSettingsGroupBox.Location = new System.Drawing.Point(13, 250);
             this.LoggingSettingsGroupBox.Name = "LoggingSettingsGroupBox";
             this.LoggingSettingsGroupBox.Size = new System.Drawing.Size(274, 120);
             this.LoggingSettingsGroupBox.TabIndex = 3;
@@ -235,12 +294,13 @@
             // 
             // ServerSelectionBox
             // 
-            this.ServerSelectionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerSelectionBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.ServerSelectionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ServerSelectionBox.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ServerSelectionBox.FormattingEnabled = true;
             this.ServerSelectionBox.Location = new System.Drawing.Point(95, 52);
             this.ServerSelectionBox.Name = "ServerSelectionBox";
-            this.ServerSelectionBox.Size = new System.Drawing.Size(162, 28);
+            this.ServerSelectionBox.Size = new System.Drawing.Size(159, 28);
             this.ServerSelectionBox.TabIndex = 4;
             // 
             // tableLayoutPanel2
@@ -284,7 +344,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(299, 384);
+            this.ClientSize = new System.Drawing.Size(299, 429);
             this.Controls.Add(this.LoggingSettingsGroupBox);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.ApplyButton);
@@ -327,5 +387,9 @@
         private System.Windows.Forms.Button PathSelectionButton;
         private System.Windows.Forms.Label DisableProcessKillLabel;
         private System.Windows.Forms.CheckBox DisableProcessKillCheckBox;
+        private System.Windows.Forms.Label TimerCountDownTimeSettingsLabel;
+        private System.Windows.Forms.TextBox TimerCountDownTimeTextBox;
+        private System.Windows.Forms.Label TimerCountDownWarnningTimeSettingsLabel;
+        private System.Windows.Forms.TextBox TimerCountDownWarnningTimeTextBox;
     }
 }

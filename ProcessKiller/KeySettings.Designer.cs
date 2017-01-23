@@ -94,5 +94,29 @@ namespace ProcessKiller {
                 this["DisableProcessKiller"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
+        public int TimerCountDownTime {
+            get {
+                return ((int)(this["TimerCountDownTime"]));
+            }
+            set {
+                this["TimerCountDownTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int TimerCountDownWarnningTime {
+            get {
+                return ((int)(this["TimerCountDownWarnningTime"]));
+            }
+            set {
+                this["TimerCountDownWarnningTime"] = value;
+            }
+        }
     }
 }

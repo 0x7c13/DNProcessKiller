@@ -28,6 +28,7 @@ namespace ProcessKiller
         private FlowLayoutPanel _buttonsContainer;
         private readonly WinEventHelper _winEvent;
         private readonly KeyboardInputEventHelper _keyboardEventHook;
+        private readonly Stopwatch _runningTimer;
 
         private const int DefaultProcessButtonHeight = 120;
         private const int DefaultTimerButtonHeight = 80;
@@ -38,9 +39,6 @@ namespace ProcessKiller
         private const int DefaultSettingsButtonHeight = 30;
         private const int DefaultStartGameButtonHeight = 50;
         private const int DefaultNewVersionDownloadLinkLabelHeight = 20;
-
-        private const int DefaultCountDownInSeconds = 90;
-        private const int DefaultCountDownAlertInSeconds = 15;
 
         private readonly Color _buttonDisabledBackColor = Color.DimGray;
 
@@ -62,6 +60,7 @@ namespace ProcessKiller
         private Keys _processKillerKey, _countDownKey;
         private string _gameDicPath;
         private bool _disableProcessKiller;
+        private int _countDownTime, _countDownWarnningTime;
 
         private static readonly object _locker = new object();
         private bool _listeningToKeyboardEvents = true;
@@ -88,6 +87,9 @@ namespace ProcessKiller
 
         public MainForm()
         {
+            _runningTimer = new Stopwatch();
+            _runningTimer.Start();
+
             this.Text = Resources.ApplicationName;
 
             InitializeComponent();
@@ -146,6 +148,10 @@ namespace ProcessKiller
             {
                 NotifyIfNewVersionFound();
             });
+
+#if DEBUG
+            TitleBarLabel.Text += " DEBUG MODE ";
+#endif
         }
 
         private void NotifyIfNewVersionFound()
@@ -195,8 +201,17 @@ namespace ProcessKiller
         {
             Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _processKillerKey);
             Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _countDownKey);
+            _countDownTime = KeySettings.Default.TimerCountDownTime;
+            _countDownWarnningTime = KeySettings.Default.TimerCountDownWarnningTime;
             _disableProcessKiller = KeySettings.Default.DisableProcessKiller;
             _gameDicPath = _getGameDir();
+
+            if (_timerButton != null)
+            {
+                _timerButton.CountDownTime = TimeSpan.FromSeconds(_countDownTime);
+                _timerButton.AlertThreshold = TimeSpan.FromSeconds(_countDownWarnningTime);
+                _timerButton.Reset();
+            }
         }
 
         private Button GetStartGameButton()
@@ -376,7 +391,7 @@ namespace ProcessKiller
             _container.Controls.Add(_buttonsContainer);
 
             _timerButton = GetTimerButton(width - container.Margin.All * 2, 
-                TimeSpan.FromSeconds(DefaultCountDownInSeconds), TimeSpan.FromSeconds(DefaultCountDownAlertInSeconds));
+                TimeSpan.FromSeconds(_countDownTime), TimeSpan.FromSeconds(_countDownWarnningTime));
             _container.Controls.Add(_timerButton);
 
             var settingsButton = GetSettingsButton();
@@ -761,12 +776,20 @@ namespace ProcessKiller
 
         private void exit_button_Click(object sender, EventArgs e)
         {
+            _runningTimer.Stop();
+            var runningHours = (int)Math.Round(_runningTimer.Elapsed.TotalHours);
+            AppTracker.TrackEvent("Timer", $"AppRunningTime_{runningHours}");
             Application.Exit();
         }
 
         private void minimize_button_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void HelpButton_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(Resources.MainForm_HelpButton_Message, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Question);
         }
 
         private void settings_form_closed(object sender, EventArgs e)

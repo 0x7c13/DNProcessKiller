@@ -197,12 +197,21 @@
     <value>发现新版本:</value>
   </data>
   <data name="Application_PublishDate" xml:space="preserve">
-    <value>(01/21/2017)</value>
+    <value>(01/24/2017)</value>
   </data>
   <data name="MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message_End" xml:space="preserve">
     <value>点击前往下载页</value>
   </data>
   <data name="SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning" xml:space="preserve">
     <value>使用秒掉功能会增加封号风险，请慎重使用，如果被反外挂发现，请立即停止使用</value>
+  </data>
+  <data name="SettingsForm_InvalidField_CountDownTime" xml:space="preserve">
+    <value>时间设置必须大于0</value>
+  </data>
+  <data name="SettingsForm_InvalidField_CountDownWarnningTime" xml:space="preserve">
+    <value>想啥呢？提示时间必须小于倒计时时间 (mdzz)</value>
+  </data>
+  <data name="MainForm_HelpButton_Message" xml:space="preserve">
+    <value>有问题或者有疑问的加群来问吧，群号: 610614351</value>
   </data>
 </root>
