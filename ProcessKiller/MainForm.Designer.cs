@@ -37,6 +37,7 @@ namespace ProcessKiller
             this.TitleBar = new System.Windows.Forms.MenuStrip();
             this.label1 = new System.Windows.Forms.Label();
             this.TitleBarLabel = new System.Windows.Forms.Label();
+            this.HelpButton = new ProcessKiller.NoFocusCueButton();
             this.MinButton = new ProcessKiller.NoFocusCueButton();
             this.ExitButton = new ProcessKiller.NoFocusCueButton();
             this.SuspendLayout();
@@ -72,6 +73,23 @@ namespace ProcessKiller
             this.TitleBarLabel.TabIndex = 0;
             this.TitleBarLabel.Text = " 小猪多开器";
             this.TitleBarLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // HelpButton
+            // 
+            this.HelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.HelpButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(70)))), ((int)(((byte)(70)))), ((int)(((byte)(70)))));
+            this.HelpButton.FlatAppearance.BorderSize = 0;
+            this.HelpButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HelpButton.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.HelpButton.ForeColor = System.Drawing.Color.White;
+            this.HelpButton.Location = new System.Drawing.Point(311, 0);
+            this.HelpButton.Margin = new System.Windows.Forms.Padding(0);
+            this.HelpButton.Name = "HelpButton";
+            this.HelpButton.Size = new System.Drawing.Size(38, 33);
+            this.HelpButton.TabIndex = 4;
+            this.HelpButton.Text = "?";
+            this.HelpButton.UseVisualStyleBackColor = false;
+            this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
             // 
             // MinButton
             // 
@@ -113,6 +131,7 @@ namespace ProcessKiller
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.ClientSize = new System.Drawing.Size(423, 419);
+            this.Controls.Add(this.HelpButton);
             this.Controls.Add(this.TitleBarLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.MinButton);
@@ -134,6 +153,7 @@ namespace ProcessKiller
         private NoFocusCueButton MinButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label TitleBarLabel;
+        private NoFocusCueButton HelpButton;
     }
 }
 

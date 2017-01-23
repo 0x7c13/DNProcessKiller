@@ -1,6 +1,7 @@
 ﻿
 namespace ProcessKiller
 {
+    using System;
     using GoogleAnalyticsTracker.Mvc4;
 
     internal class AppTracker
@@ -11,18 +12,26 @@ namespace ProcessKiller
 
         public static async void TrackPageView(string pageTitle, string pageUrl)
         {
+#if !DEBUG
             using (var tracker = new Tracker(AccountName, TrackingDomain))
             {
                 await tracker.TrackPageViewAsync(pageTitle, pageUrl);
             }
+#else
+            Console.WriteLine($"TrackPageView: {pageTitle} - {pageUrl}");
+#endif
         }
 
         public static async void TrackEvent(string category, string action)
         {
+#if !DEBUG
             using (var tracker = new Tracker(AccountName, TrackingDomain))
             {
                 await tracker.TrackEventAsync(category, action);
             }
+#else
+            Console.WriteLine($"TrackEvent: {category} - {action}");
+#endif
         }
     }
 }

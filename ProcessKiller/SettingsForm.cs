@@ -35,7 +35,8 @@ namespace ProcessKiller
             this.SettingsTable.MouseDown += SettingsForm_MouseDown;
             this.ProcessKillerButtonLabel.MouseDown += SettingsForm_MouseDown;
             this.CountDownButtonLabel.MouseDown += SettingsForm_MouseDown;
-
+            this.TimerCountDownTimeTextBox.KeyPress += TimerCountDownTimeTextBox_KeyPress;
+            this.TimerCountDownWarnningTimeTextBox.KeyPress += TimerCountDownWarnningTimeTextBox_KeyPress;
             _keyboardEventHook = new KeyboardInputEventHelper();
             _keyboardEventHook.KeyBoardKeyDownEvent += keyboard_key_down;
 
@@ -66,11 +67,15 @@ namespace ProcessKiller
             Enum.TryParse(KeySettings.Default.ProcessKillerKey.ToString(), out _userDefinedProcessKillerKey);
             Enum.TryParse(KeySettings.Default.CountDownKey.ToString(), out _userDefinedCountDownKey);
             _disableProcessKiller = KeySettings.Default.DisableProcessKiller;
+            var timerCountDownTime = KeySettings.Default.TimerCountDownTime;
+            var timerCountDownWarnningTime = KeySettings.Default.TimerCountDownWarnningTime;
             var gameDicPath = KeySettings.Default.GameDicPath;
             var serverName = KeySettings.Default.ServerName;
 
             this.ProcessKillerKeyTextbox.Text = _userDefinedProcessKillerKey.ToString();
             this.CountDownKeyTextBox.Text = _userDefinedCountDownKey.ToString();
+            this.TimerCountDownTimeTextBox.Text = timerCountDownTime.ToString();
+            this.TimerCountDownWarnningTimeTextBox.Text = timerCountDownWarnningTime.ToString();
 
             if (!string.IsNullOrEmpty(gameDicPath))
             {
@@ -148,9 +153,51 @@ namespace ProcessKiller
 
         private void ApplyButton_Click(object sender, EventArgs e)
         {
-            SaveUserSettings();
-           _keyboardEventHook.Dispose();
-            this.Close();
+            string invalidFieldWarnningMessage;
+            if (_hasInvalidFields(out invalidFieldWarnningMessage))
+            {
+                MessageBox.Show(invalidFieldWarnningMessage, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                SaveUserSettings();
+                _keyboardEventHook.Dispose();
+                this.Close();
+            }
+        }
+
+        private bool _hasInvalidFields(out string invalidFieldWarnningMessage)
+        {
+            invalidFieldWarnningMessage = string.Empty;
+
+            int countDownTime, countDownWarnningTime;
+
+            // check count down time
+            {
+                countDownTime = int.Parse(this.TimerCountDownTimeTextBox.Text);
+                if (countDownTime <= 0)
+                {
+                    invalidFieldWarnningMessage = Resources.SettingsForm_InvalidField_CountDownTime;
+                    return true;
+                }
+            }
+            // check count down warnning time
+            {
+                countDownWarnningTime = int.Parse(this.TimerCountDownWarnningTimeTextBox.Text);
+                if (countDownWarnningTime <= 0)
+                {
+                    invalidFieldWarnningMessage = Resources.SettingsForm_InvalidField_CountDownTime;
+                    return true;
+                }
+            }
+            // count down time should be greater than warnning time
+            if (countDownTime <= countDownWarnningTime)
+            {
+                invalidFieldWarnningMessage = Resources.SettingsForm_InvalidField_CountDownWarnningTime;
+                return true;
+            }
+
+            return false;
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
@@ -189,6 +236,21 @@ namespace ProcessKiller
                 MessageBox.Show(Resources.SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+        private void TimerCountDownTimeTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void TimerCountDownWarnningTimeTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
 
         private void SaveUserSettings()
         {
@@ -215,6 +277,10 @@ namespace ProcessKiller
                 }
                 KeySettings.Default.ServerName = this.ServerSelectionBox.SelectedItem.ToString();
             }
+
+            KeySettings.Default.TimerCountDownTime = int.Parse(this.TimerCountDownTimeTextBox.Text);
+
+            KeySettings.Default.TimerCountDownWarnningTime = int.Parse(this.TimerCountDownWarnningTimeTextBox.Text);
 
             KeySettings.Default.DisableProcessKiller = this.DisableProcessKillCheckBox.Checked;
 
