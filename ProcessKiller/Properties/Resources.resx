@@ -124,13 +124,13 @@
     <value>小猪多开器</value>
   </data>
   <data name="MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage" xml:space="preserve">
-    <value>点我或按键掉线</value>
+    <value>点我或按键断开连接</value>
   </data>
   <data name="MainForm_InitializeButtons_ClickToKillProcessMessage" xml:space="preserve">
-    <value>点我掉线</value>
+    <value>点我断开连接</value>
   </data>
   <data name="MainForm_button_click_KillingProcessMessage" xml:space="preserve">
-    <value>正在关闭此进程...</value>
+    <value>正在断开连接中...</value>
   </data>
   <data name="MainForm_InitializeCopyRightLabel_CopyrightMessage" xml:space="preserve">
     <value>南方电信一区 柒才 &lt;女神之瞳&gt;</value>
@@ -197,7 +197,7 @@
     <value>发现新版本:</value>
   </data>
   <data name="Application_PublishDate" xml:space="preserve">
-    <value>(01/24/2017)</value>
+    <value>(02/09/2017)</value>
   </data>
   <data name="MainForm_GetNewVersionDownloadLinkLabel_NewVersionFound_Message_End" xml:space="preserve">
     <value>点击前往下载页</value>
@@ -212,6 +212,9 @@
     <value>想啥呢？提示时间必须小于倒计时时间 (mdzz)</value>
   </data>
   <data name="MainForm_HelpButton_Message" xml:space="preserve">
-    <value>有问题或者有疑问的加群来问吧，群号: 610614351</value>
+    <value>有问题或者有疑问先看帖子，还有问题的话加群来问吧，群号: 610614351</value>
+  </data>
+  <data name="ProcessButton_DisconnectExistingTCPConnections_ErrorMessage" xml:space="preserve">
+    <value>掉线时出现问题： </value>
   </data>
 </root>

@@ -231,10 +231,10 @@ namespace ProcessKiller
         {
             _disableProcessKiller = this.DisableProcessKillCheckBox.Checked;
             this.ProcessKillerKeyTextbox.Enabled = !_disableProcessKiller;
-            if (!_disableProcessKiller)
-            {
-                MessageBox.Show(Resources.SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            //if (!_disableProcessKiller)
+            //{
+            //    MessageBox.Show(Resources.SettingsForm_DisableProcessKillCheckBox_CheckedChanged_Warnning, Resources.ApplicationName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //}
         }
         private void TimerCountDownTimeTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {

@@ -144,13 +144,10 @@ namespace ProcessKiller
             GC.KeepAlive(_keyboardEventHook);
 
             // new version check
-            Task.Run(() =>
-            {
-                NotifyIfNewVersionFound();
-            });
+            Task.Factory.StartNew(NotifyIfNewVersionFound);
 
 #if DEBUG
-            TitleBarLabel.Text += " DEBUG MODE ";
+            TitleBarLabel.Text += " DEBUG ";
 #endif
         }
 

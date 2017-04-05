@@ -85,7 +85,7 @@ namespace ProcessKiller
             this.HelpButton.Location = new System.Drawing.Point(311, 0);
             this.HelpButton.Margin = new System.Windows.Forms.Padding(0);
             this.HelpButton.Name = "HelpButton";
-            this.HelpButton.Size = new System.Drawing.Size(38, 33);
+            this.HelpButton.Size = new System.Drawing.Size(37, 33);
             this.HelpButton.TabIndex = 4;
             this.HelpButton.Text = "?";
             this.HelpButton.UseVisualStyleBackColor = false;
@@ -102,7 +102,7 @@ namespace ProcessKiller
             this.MinButton.Location = new System.Drawing.Point(348, 0);
             this.MinButton.Margin = new System.Windows.Forms.Padding(0);
             this.MinButton.Name = "MinButton";
-            this.MinButton.Size = new System.Drawing.Size(38, 33);
+            this.MinButton.Size = new System.Drawing.Size(37, 33);
             this.MinButton.TabIndex = 2;
             this.MinButton.Text = "_";
             this.MinButton.UseVisualStyleBackColor = false;
@@ -119,7 +119,7 @@ namespace ProcessKiller
             this.ExitButton.Location = new System.Drawing.Point(385, 0);
             this.ExitButton.Margin = new System.Windows.Forms.Padding(0);
             this.ExitButton.Name = "ExitButton";
-            this.ExitButton.Size = new System.Drawing.Size(38, 33);
+            this.ExitButton.Size = new System.Drawing.Size(37, 33);
             this.ExitButton.TabIndex = 1;
             this.ExitButton.Text = "X";
             this.ExitButton.UseVisualStyleBackColor = false;
@@ -130,7 +130,7 @@ namespace ProcessKiller
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
-            this.ClientSize = new System.Drawing.Size(423, 419);
+            this.ClientSize = new System.Drawing.Size(423, 418);
             this.Controls.Add(this.HelpButton);
             this.Controls.Add(this.TitleBarLabel);
             this.Controls.Add(this.label1);
@@ -138,6 +138,7 @@ namespace ProcessKiller
             this.Controls.Add(this.ExitButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Opacity = 0.95D;
