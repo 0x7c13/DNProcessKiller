@@ -18,7 +18,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="DisableProcessKiller" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TimerCountDownTime" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">90</Value>

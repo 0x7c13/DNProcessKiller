@@ -70,7 +70,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (01/24/2017).
+        ///   Looks up a localized string similar to (02/09/2017).
         /// </summary>
         internal static string Application_PublishDate {
             get {
@@ -152,7 +152,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 正在关闭此进程....
+        ///   Looks up a localized string similar to 正在断开连接中....
         /// </summary>
         internal static string MainForm_button_click_KillingProcessMessage {
             get {
@@ -215,7 +215,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 有问题或者有疑问的加群来问吧，群号: 610614351.
+        ///   Looks up a localized string similar to 有问题或者有疑问先看帖子，还有问题的话加群来问吧，群号: 610614351.
         /// </summary>
         internal static string MainForm_HelpButton_Message {
             get {
@@ -224,7 +224,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 点我或按键掉线.
+        ///   Looks up a localized string similar to 点我或按键断开连接.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessHighlightedMessage {
             get {
@@ -233,7 +233,7 @@ namespace ProcessKiller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 点我掉线.
+        ///   Looks up a localized string similar to 点我断开连接.
         /// </summary>
         internal static string MainForm_InitializeButtons_ClickToKillProcessMessage {
             get {
@@ -274,6 +274,15 @@ namespace ProcessKiller.Properties {
         internal static string MainForm_start_game_button_game_start_message {
             get {
                 return ResourceManager.GetString("MainForm_start_game_button_game_start_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 掉线时出现问题： .
+        /// </summary>
+        internal static string ProcessButton_DisconnectExistingTCPConnections_ErrorMessage {
+            get {
+                return ResourceManager.GetString("ProcessButton_DisconnectExistingTCPConnections_ErrorMessage", resourceCulture);
             }
         }
         

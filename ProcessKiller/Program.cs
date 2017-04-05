@@ -5,8 +5,8 @@ namespace ProcessKiller
     using System.Windows.Forms;
     using System.Security.Principal;
     using Properties;
-    using System.Reflection; 
-
+    using System.Reflection;
+    using System.Runtime.InteropServices;
 
     static class Program
     {
